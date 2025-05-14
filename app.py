@@ -166,6 +166,20 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
     """
     st.markdown('<div class="section-title">JAR System Analysis</div>', unsafe_allow_html=True)
     
+    # Initialize button states and selection variables to avoid UnboundLocalError
+    save_a = False
+    save_b = False
+    load_a = False
+    load_b = False
+    delete_btn = False
+    
+    # Initialize selection variables
+    save_name_a = ""
+    save_name_b = ""
+    selected_a = ""
+    selected_b = ""
+    to_delete = ""
+    
     # Initialize session state for saved practitioners if not exists
     if "saved_practitioners" not in st.session_state:
         st.session_state.saved_practitioners = load_practitioners_from_disk()
