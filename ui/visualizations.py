@@ -184,19 +184,9 @@ def render_factor_visualization(factors: FactorResults, config: JARConfig) -> No
     </div>
     """, unsafe_allow_html=True)
     
-    # Provide detailed views as tabs
-    tab1, tab2 = st.tabs([
-        "Details", 
-        "Radar Chart"
-    ])
-    
-    with tab1:
-        st.markdown("<h3 style='font-size: 24px; margin: 20px 0;'>Factor Breakdown</h3>", unsafe_allow_html=True)
-        render_factor_breakdown_table(factors, hs)
-    
-    with tab2:
-        st.markdown("<h3 style='font-size: 24px; margin: 20px 0;'>Attribute Radar</h3>", unsafe_allow_html=True)
-        render_practitioner_radar(factors)
+    # Provide just the radar chart view
+    st.markdown("<h3 style='font-size: 24px; margin: 20px 0;'>Attribute Radar</h3>", unsafe_allow_html=True)
+    render_practitioner_radar(factors)
 
 def render_practitioner_radar(factors: FactorResults) -> None:
     """
@@ -545,7 +535,9 @@ def render_comparison_visualization(
     factors_b: FactorResults, 
     hs_a: float, 
     hs_b: float, 
-    config: JARConfig
+    config: JARConfig,
+    name_a: str = "Practitioner A",
+    name_b: str = "Practitioner B"
 ) -> None:
     """
     Render visualization comparing two practitioners.
@@ -556,17 +548,13 @@ def render_comparison_visualization(
         hs_a: Handicapped score for practitioner A
         hs_b: Handicapped score for practitioner B
         config: JAR system configuration
+        name_a: Name of practitioner A (default: "Practitioner A")
+        name_b: Name of practitioner B (default: "Practitioner B")
     """
     st.write("### Practitioner Comparison")
     
-    # Create tabs for different comparisons
-    tab1, tab2 = st.tabs(["Factor Comparison", "Radar Chart"])
-    
-    with tab1:
-        render_factor_comparison_chart(factors_a, factors_b, hs_a, hs_b)
-    
-    with tab2:
-        render_radar_chart(factors_a, factors_b)
+    # Show only the radar chart comparison with actual practitioner names
+    render_radar_chart(factors_a, factors_b, name_a=name_a, name_b=name_b)
 
 def render_factor_comparison_chart(
     factors_a: FactorResults, 
@@ -662,13 +650,15 @@ def render_factor_comparison_chart(
     # Show the plot
     st.pyplot(fig)
 
-def render_radar_chart(factors_a: FactorResults, factors_b: FactorResults) -> None:
+def render_radar_chart(factors_a: FactorResults, factors_b: FactorResults, name_a: str = "Practitioner A", name_b: str = "Practitioner B") -> None:
     """
     Render a radar chart comparing practitioners' attributes.
     
     Args:
         factors_a: Calculated factors for practitioner A
         factors_b: Calculated factors for practitioner B
+        name_a: Name of practitioner A (default: "Practitioner A")
+        name_b: Name of practitioner B (default: "Practitioner B")
     """
     # Define categories for radar chart
     categories = ['Belt Rank', 'Age', 'Weight', 'Athleticism', 
@@ -722,10 +712,10 @@ def render_radar_chart(factors_a: FactorResults, factors_b: FactorResults) -> No
     ax.title.set_color('#e9ecef')
     
     # Draw the radar chart with thicker lines and clearer markers
-    ax.plot(angles, values_a, 'o-', linewidth=3, markersize=8, label='Practitioner A', color='#3366cc')
+    ax.plot(angles, values_a, 'o-', linewidth=3, markersize=8, label=name_a, color='#3366cc')
     ax.fill(angles, values_a, alpha=0.2, color='#3366cc')
     
-    ax.plot(angles, values_b, 'o-', linewidth=3, markersize=8, label='Practitioner B', color='#cc3333')
+    ax.plot(angles, values_b, 'o-', linewidth=3, markersize=8, label=name_b, color='#cc3333')
     ax.fill(angles, values_b, alpha=0.2, color='#cc3333')
     
     # Add categories labels with larger, more readable font
@@ -760,12 +750,16 @@ def render_radar_chart(factors_a: FactorResults, factors_b: FactorResults) -> No
             else:  # Black belt
                 label_b = "Black"
                 
-            ax.annotate(f"A: {label_a}", xy=(angle, value_a + 0.1), 
+            # Use shorter name for annotation if name is too long
+            name_a_short = name_a[:10] + "..." if len(name_a) > 10 else name_a
+            name_b_short = name_b[:10] + "..." if len(name_b) > 10 else name_b
+            
+            ax.annotate(f"{name_a_short}: {label_a}", xy=(angle, value_a + 0.1), 
                        xytext=(angle, value_a + 0.2),
                        arrowprops=dict(arrowstyle='->', color='#3498db'),
                        ha='center', va='center', color='#3498db')
             
-            ax.annotate(f"B: {label_b}", xy=(angle, value_b + 0.1), 
+            ax.annotate(f"{name_b_short}: {label_b}", xy=(angle, value_b + 0.1), 
                        xytext=(angle, value_b + 0.2),
                        arrowprops=dict(arrowstyle='->', color='#e74c3c'),
                        ha='center', va='center', color='#e74c3c')

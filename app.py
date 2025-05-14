@@ -492,8 +492,16 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
         profile_a = profile_generator.generate_profile(practitioner_a, factors_a, hs_a)
         profile_b = profile_generator.generate_profile(practitioner_b, factors_b, hs_b)
         
-        # Display visualization comparison
-        render_comparison_visualization(factors_a, factors_b, hs_a, hs_b, st.session_state.config)
+        # Display visualization comparison with actual practitioner names
+        render_comparison_visualization(
+            factors_a, 
+            factors_b, 
+            hs_a, 
+            hs_b, 
+            st.session_state.config,
+            name_a=practitioner_a.name if practitioner_a.name else "Practitioner A",
+            name_b=practitioner_b.name if practitioner_b.name else "Practitioner B"
+        )
         
         # Display profile comparison
         render_profile_comparison(profile_a, profile_b)
