@@ -116,15 +116,18 @@ def render_profile(profile: RollDynamicsProfile) -> None:
     </style>
     """, unsafe_allow_html=True)
     
+    # Render the profile container with basic info
     st.markdown(f"""
     <div class="profile-container">
         <div class="profile-header">Roll Dynamics Profile: {profile.practitioner_name}</div>
         <p class="profile-data"><strong>Handicapped Score:</strong> {profile.handicapped_score:.2f}</p>
         <p class="profile-data"><strong>Dominant Trait:</strong> {profile.dominant_trait}</p>
         <p class="profile-data"><strong>Likely Roll Approach:</strong> {profile.likely_approach}</p>
-        
-        <div class="profile-section-header">Key Strengths</div>
+    </div>
     """, unsafe_allow_html=True)
+    
+    # Use separate Streamlit components for the sections
+    st.markdown("<h3>Key Strengths</h3>", unsafe_allow_html=True)
     
     # Check if key_strengths exists and has content
     if profile.key_strengths and len(profile.key_strengths) > 0:
@@ -138,9 +141,7 @@ def render_profile(profile: RollDynamicsProfile) -> None:
         <div class="strength-item">No specific strengths identified</div>
         """, unsafe_allow_html=True)
     
-    st.markdown("""
-        <div class="profile-section-header">Key Challenges</div>
-    """, unsafe_allow_html=True)
+    st.markdown("<h3>Key Challenges</h3>", unsafe_allow_html=True)
     
     # Check if key_challenges exists and has content
     if profile.key_challenges and len(profile.key_challenges) > 0:
@@ -161,10 +162,8 @@ def render_profile(profile: RollDynamicsProfile) -> None:
         "Low": "level-low"
     }
     
-    st.markdown("""
-        <div class="profile-section-header">Technical Assessment</div>
-        <div class="assessment-container">
-    """, unsafe_allow_html=True)
+    st.markdown("<h3>Technical Assessment</h3>", unsafe_allow_html=True)
+    st.markdown("""<div class="assessment-container">""", unsafe_allow_html=True)
     
     # Display Control Potential
     st.markdown(f"""
@@ -190,10 +189,8 @@ def render_profile(profile: RollDynamicsProfile) -> None:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("""
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Close the assessment container
+    st.markdown("</div>", unsafe_allow_html=True)
 
 def render_profile_comparison(
     profile_a: RollDynamicsProfile, 
@@ -206,19 +203,37 @@ def render_profile_comparison(
         profile_a: Roll Dynamics Profile for practitioner A
         profile_b: Roll Dynamics Profile for practitioner B
     """
+    # Using the built-in column layout with custom styling for better control
+    st.markdown(
+        """
+        <style>
+        .profile-columns {
+            display: flex;
+            gap: 20px;
+        }
+        .profile-column {
+            flex: 1;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
     # Create two columns for the comparison
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader(f"Profile: {profile_a.practitioner_name}")
+        # Use markdown with HTML to ensure proper rendering
+        st.markdown(f"## Profile: {profile_a.practitioner_name}", unsafe_allow_html=True)
         render_profile(profile_a)
     
     with col2:
-        st.subheader(f"Profile: {profile_b.practitioner_name}")
+        # Use markdown with HTML to ensure proper rendering
+        st.markdown(f"## Profile: {profile_b.practitioner_name}", unsafe_allow_html=True)
         render_profile(profile_b)
     
     # Display a comparison analysis
-    st.subheader("Matchup Analysis")
+    st.markdown("## Matchup Analysis", unsafe_allow_html=True)
     
     # Calculate score differential
     score_diff = abs(profile_a.handicapped_score - profile_b.handicapped_score)
@@ -237,16 +252,23 @@ def render_profile_comparison(
     # Determine higher-scored practitioner
     higher_profile = profile_a if profile_a.handicapped_score > profile_b.handicapped_score else profile_b
     
-    st.markdown(f"""
-    <div class="profile-container" style="margin-top: 30px;">
-        <div class="profile-header">Matchup Analysis</div>
-        <div class="profile-data"><strong>Score Differential:</strong> {score_diff:.2f} points ({evenness})</div>
-        <div class="profile-data"><strong>Matchup Type:</strong> {determine_matchup_type(profile_a, profile_b)}</div>
-        <div style="margin-top: 15px; font-size: 1.2em; line-height: 1.5; padding: 15px; background-color: var(--primary-light); border-radius: 8px;">
+    # Use container and columns for the matchup analysis
+    with st.container():
+        st.markdown(f"""
+        <div class="profile-container" style="margin-top: 30px;">
+            <div class="profile-header">Matchup Analysis</div>
+            <div class="profile-data"><strong>Score Differential:</strong> {score_diff:.2f} points ({evenness})</div>
+            <div class="profile-data"><strong>Matchup Type:</strong> {determine_matchup_type(profile_a, profile_b)}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Separate analysis into its own component
+        st.markdown("<h3>Analysis</h3>", unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style="font-size: 1.2em; line-height: 1.5; padding: 15px; background-color: rgba(79, 146, 211, 0.15); border-radius: 8px; border: 1px solid #495057;">
             {generate_matchup_analysis(profile_a, profile_b)}
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 def determine_matchup_type(
     profile_a: RollDynamicsProfile, 

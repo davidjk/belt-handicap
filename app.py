@@ -58,6 +58,218 @@ def load_practitioners_from_disk():
         print(f"Error loading saved practitioners: {e}")
         return {}
 
+def load_practitioner_a(practitioner_name):
+    """Load a saved practitioner into the A slot."""
+    print(f"\n----- LOADING PRACTITIONER A: {practitioner_name} -----")
+    
+    # Log keys that start with practitioner_a_ before loading
+    print("BEFORE LOADING - Practitioner A session state keys:")
+    for key in st.session_state:
+        if key.startswith("practitioner_a_"):
+            print(f"  {key}: {st.session_state[key]}")
+    
+    if practitioner_name in st.session_state.saved_practitioners:
+        data = st.session_state.saved_practitioners[practitioner_name]
+        print(f"Loading data from saved_practitioners: {data}")
+        
+        # First, clear any existing practitioner A data to prevent contamination
+        # This ensures we don't have lingering values from a previous practitioner
+        to_remove = []
+        for key in st.session_state:
+            if key.startswith("practitioner_a_"):
+                to_remove.append(key)
+        
+        for key in to_remove:
+            del st.session_state[key]
+        
+        # Save the original loaded practitioner state in a special key
+        # This will be used to restore values if they get overwritten
+        st.session_state.loaded_practitioner_a = {}
+            
+        # Store all loaded values in this special key
+        st.session_state.loaded_practitioner_a["name"] = data["name"]
+        st.session_state.loaded_practitioner_a["belt"] = data["belt"]
+        st.session_state.loaded_practitioner_a["age"] = data["age"]
+        st.session_state.loaded_practitioner_a["weight"] = int(data["weight"])
+        
+        # Save the raw fitness value from the data
+        st.session_state.loaded_practitioner_a["fitness"] = data["fitness"]
+        print(f"Saved raw fitness value for A: {data['fitness']}")
+        
+        # Convert fitness score to readable format
+        fitness_level = {
+            25: "Below Average (<30th percentile)",
+            50: "Average (30th-60th percentile)",
+            70: "Above Average (61st-80th percentile)", 
+            88: "Notably Athletic (81st-95th percentile)",
+            97: "Exceptional Athlete (>95th percentile)"
+        }.get(data["fitness"], "Average (30th-60th percentile)")
+        
+        st.session_state.loaded_practitioner_a["fitness_level"] = fitness_level
+        st.session_state.loaded_practitioner_a["sessions"] = data["sessions"]
+        st.session_state.loaded_practitioner_a["comp"] = data["competition"]
+        
+        # Set the numeric value for fitness slider
+        fitness_options = [
+            "Below Average (<30th percentile)",
+            "Average (30th-60th percentile)",
+            "Above Average (61st-80th percentile)",
+            "Notably Athletic (81st-95th percentile)",
+            "Exceptional Athlete (>95th percentile)"
+        ]
+        try:
+            fitness_index = fitness_options.index(fitness_level)
+            st.session_state.loaded_practitioner_a["fitness_numeric"] = fitness_index + 1
+        except ValueError:
+            st.session_state.loaded_practitioner_a["fitness_numeric"] = 2  # Default to average
+        
+        # Handle grappling art experience
+        if "art" in data:
+            st.session_state.loaded_practitioner_a["art"] = data["art"]
+            if data["art"] != "None" and "exp_level" in data:
+                st.session_state.loaded_practitioner_a["exp_level"] = data["exp_level"]
+                
+        # Now, also set the actual form fields
+        st.session_state.practitioner_a_name = data["name"]
+        st.session_state.practitioner_a_belt = data["belt"]
+        st.session_state.practitioner_a_age = data["age"]
+        st.session_state.practitioner_a_weight = int(data["weight"])
+        st.session_state.practitioner_a_fitness_level = fitness_level
+        st.session_state.practitioner_a_sessions = data["sessions"]
+        st.session_state.practitioner_a_comp = data["competition"]
+        
+        try:
+            st.session_state.practitioner_a_fitness_numeric = fitness_index + 1
+        except:
+            st.session_state.practitioner_a_fitness_numeric = 2
+            
+        if "art" in data:
+            st.session_state.practitioner_a_art = data["art"]
+            if data["art"] != "None" and "exp_level" in data:
+                st.session_state.practitioner_a_exp_level = data["exp_level"]
+        
+        # Log keys that start with practitioner_a_ after loading
+        print("AFTER LOADING - Practitioner A session state keys:")
+        for key in st.session_state:
+            if key.startswith("practitioner_a_"):
+                print(f"  {key}: {st.session_state[key]}")
+        
+        print("----- FINISHED LOADING PRACTITIONER A -----\n")
+        return True
+    return False
+
+def load_practitioner_b(practitioner_name):
+    """Load a saved practitioner into the B slot."""
+    print(f"\n----- LOADING PRACTITIONER B: {practitioner_name} -----")
+    
+    # Log keys that start with practitioner_b_ before loading
+    print("BEFORE LOADING - Practitioner B session state keys:")
+    for key in st.session_state:
+        if key.startswith("practitioner_b_"):
+            print(f"  {key}: {st.session_state[key]}")
+    
+    # Also log keys for practitioner A to see if they change
+    print("BEFORE LOADING B - Practitioner A session state keys:")
+    for key in st.session_state:
+        if key.startswith("practitioner_a_"):
+            print(f"  {key}: {st.session_state[key]}")
+    
+    if practitioner_name in st.session_state.saved_practitioners:
+        data = st.session_state.saved_practitioners[practitioner_name]
+        print(f"Loading data from saved_practitioners: {data}")
+        
+        # First, clear any existing practitioner B data to prevent contamination
+        # This ensures we don't have lingering values from a previous practitioner
+        to_remove = []
+        for key in st.session_state:
+            if key.startswith("practitioner_b_"):
+                to_remove.append(key)
+        
+        for key in to_remove:
+            del st.session_state[key]
+        
+        # Save the original loaded practitioner state in a special key
+        # This will be used to restore values if they get overwritten
+        st.session_state.loaded_practitioner_b = {}
+            
+        # Store all loaded values in this special key
+        st.session_state.loaded_practitioner_b["name"] = data["name"]
+        st.session_state.loaded_practitioner_b["belt"] = data["belt"]
+        st.session_state.loaded_practitioner_b["age"] = data["age"]
+        st.session_state.loaded_practitioner_b["weight"] = int(data["weight"])
+        
+        # Save the raw fitness value from the data
+        st.session_state.loaded_practitioner_b["fitness"] = data["fitness"]
+        print(f"Saved raw fitness value for B: {data['fitness']}")
+        
+        # Convert fitness score to readable format
+        fitness_level = {
+            25: "Below Average (<30th percentile)",
+            50: "Average (30th-60th percentile)",
+            70: "Above Average (61st-80th percentile)", 
+            88: "Notably Athletic (81st-95th percentile)",
+            97: "Exceptional Athlete (>95th percentile)"
+        }.get(data["fitness"], "Average (30th-60th percentile)")
+        
+        st.session_state.loaded_practitioner_b["fitness_level"] = fitness_level
+        st.session_state.loaded_practitioner_b["sessions"] = data["sessions"]
+        st.session_state.loaded_practitioner_b["comp"] = data["competition"]
+        
+        # Set the numeric value for fitness slider
+        fitness_options = [
+            "Below Average (<30th percentile)",
+            "Average (30th-60th percentile)",
+            "Above Average (61st-80th percentile)",
+            "Notably Athletic (81st-95th percentile)",
+            "Exceptional Athlete (>95th percentile)"
+        ]
+        try:
+            fitness_index = fitness_options.index(fitness_level)
+            st.session_state.loaded_practitioner_b["fitness_numeric"] = fitness_index + 1
+        except ValueError:
+            st.session_state.loaded_practitioner_b["fitness_numeric"] = 2  # Default to average
+        
+        # Handle grappling art experience
+        if "art" in data:
+            st.session_state.loaded_practitioner_b["art"] = data["art"]
+            if data["art"] != "None" and "exp_level" in data:
+                st.session_state.loaded_practitioner_b["exp_level"] = data["exp_level"]
+                
+        # Now, also set the actual form fields
+        st.session_state.practitioner_b_name = data["name"]
+        st.session_state.practitioner_b_belt = data["belt"]
+        st.session_state.practitioner_b_age = data["age"]
+        st.session_state.practitioner_b_weight = int(data["weight"])
+        st.session_state.practitioner_b_fitness_level = fitness_level
+        st.session_state.practitioner_b_sessions = data["sessions"]
+        st.session_state.practitioner_b_comp = data["competition"]
+        
+        try:
+            st.session_state.practitioner_b_fitness_numeric = fitness_index + 1
+        except:
+            st.session_state.practitioner_b_fitness_numeric = 2
+            
+        if "art" in data:
+            st.session_state.practitioner_b_art = data["art"]
+            if data["art"] != "None" and "exp_level" in data:
+                st.session_state.practitioner_b_exp_level = data["exp_level"]
+        
+        # Log keys that start with practitioner_b_ after loading
+        print("AFTER LOADING - Practitioner B session state keys:")
+        for key in st.session_state:
+            if key.startswith("practitioner_b_"):
+                print(f"  {key}: {st.session_state[key]}")
+        
+        # Also log keys for practitioner A to see if they changed
+        print("AFTER LOADING B - Practitioner A session state keys:")
+        for key in st.session_state:
+            if key.startswith("practitioner_a_"):
+                print(f"  {key}: {st.session_state[key]}")
+        
+        print("----- FINISHED LOADING PRACTITIONER B -----\n")
+        return True
+    return False
+
 def main():
     """
     Main Streamlit application entry point.
@@ -166,24 +378,202 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
     """
     st.markdown('<div class="section-title">JAR System Analysis</div>', unsafe_allow_html=True)
     
-    # Initialize button states and selection variables to avoid UnboundLocalError
-    save_a = False
-    save_b = False
-    load_a = False
-    load_b = False
-    delete_btn = False
+    # Define the fitness level mapping for score calculation
+    fitness_level_mapping = {
+        "Below Average (<30th percentile)": 25,
+        "Average (30th-60th percentile)": 50,
+        "Above Average (61st-80th percentile)": 70,
+        "Notably Athletic (81st-95th percentile)": 88,
+        "Exceptional Athlete (>95th percentile)": 97
+    }
     
-    # Initialize selection variables
-    save_name_a = ""
-    save_name_b = ""
-    selected_a = ""
-    selected_b = ""
-    to_delete = ""
+    # Function to calculate and display scores reactively
+    def update_scores():
+        print("\n----- UPDATING SCORES -----")
+        
+        # Ensure loaded values are restored if needed
+        loaded_key_a = "loaded_practitioner_a"
+        if loaded_key_a in st.session_state:
+            for field, value in st.session_state[loaded_key_a].items():
+                field_key = f"practitioner_a_{field}"
+                if field_key not in st.session_state or not st.session_state[field_key]:
+                    print(f"RESTORING from loaded_practitioner_a: {field_key} = {value}")
+                    st.session_state[field_key] = value
+                    
+        loaded_key_b = "loaded_practitioner_b"
+        if loaded_key_b in st.session_state:
+            for field, value in st.session_state[loaded_key_b].items():
+                field_key = f"practitioner_b_{field}"
+                if field_key not in st.session_state or not st.session_state[field_key]:
+                    print(f"RESTORING from loaded_practitioner_b: {field_key} = {value}")
+                    st.session_state[field_key] = value
+        
+        # Log the state of session variables for both practitioners
+        print("PRACTITIONER A SESSION STATE BEFORE UPDATE:")
+        for key in st.session_state:
+            if key.startswith("practitioner_a_"):
+                print(f"  {key}: {st.session_state[key]}")
+                
+        print("\nPRACTITIONER B SESSION STATE BEFORE UPDATE:")
+        for key in st.session_state:
+            if key.startswith("practitioner_b_"):
+                print(f"  {key}: {st.session_state[key]}")
+        
+        try:
+            # Create a new calculator
+            calculator = Calculator(st.session_state.config)
+            
+            # Check if we have loaded practitioner data and force those values
+            # This ensures data consistency across all calculations
+            loaded_practitioner_a = {}
+            if "loaded_practitioner_a" in st.session_state:
+                loaded_practitioner_a = st.session_state.loaded_practitioner_a
+                print("Loaded practitioner A found in session state - using these values for calculation")
+            
+            # Make a deep copy of the session state values for each practitioner
+            # This prevents cross-contamination between practitioners
+            practitioner_a_data = {
+                "name": loaded_practitioner_a.get("name") if "name" in loaded_practitioner_a else st.session_state.get("practitioner_a_name", ""),
+                "belt": loaded_practitioner_a.get("belt") if "belt" in loaded_practitioner_a else st.session_state.get("practitioner_a_belt", "White"),
+                "age": loaded_practitioner_a.get("age") if "age" in loaded_practitioner_a else st.session_state.get("practitioner_a_age", 30),
+                "weight": float(loaded_practitioner_a.get("weight", 0)) if "weight" in loaded_practitioner_a else float(st.session_state.get("practitioner_a_weight", 170.0)),
+                "fitness_level": loaded_practitioner_a.get("fitness_level") if "fitness_level" in loaded_practitioner_a else st.session_state.get("practitioner_a_fitness_level", "Average (30th-60th percentile)"),
+                "art": loaded_practitioner_a.get("art") if "art" in loaded_practitioner_a else st.session_state.get("practitioner_a_art", "None"),
+                "exp_level": loaded_practitioner_a.get("exp_level") if "exp_level" in loaded_practitioner_a else st.session_state.get("practitioner_a_exp_level", ""),
+                "sessions": loaded_practitioner_a.get("sessions") if "sessions" in loaded_practitioner_a else st.session_state.get("practitioner_a_sessions", 3),
+                "comp": loaded_practitioner_a.get("comp") if "comp" in loaded_practitioner_a else st.session_state.get("practitioner_a_comp", "None")
+            }
+            
+            # Check if we have loaded practitioner data for B
+            loaded_practitioner_b = {}
+            if "loaded_practitioner_b" in st.session_state:
+                loaded_practitioner_b = st.session_state.loaded_practitioner_b
+                print("Loaded practitioner B found in session state - using these values for calculation")
+            
+            practitioner_b_data = {
+                "name": loaded_practitioner_b.get("name") if "name" in loaded_practitioner_b else st.session_state.get("practitioner_b_name", ""),
+                "belt": loaded_practitioner_b.get("belt") if "belt" in loaded_practitioner_b else st.session_state.get("practitioner_b_belt", "White"),
+                "age": loaded_practitioner_b.get("age") if "age" in loaded_practitioner_b else st.session_state.get("practitioner_b_age", 30),
+                "weight": float(loaded_practitioner_b.get("weight", 0)) if "weight" in loaded_practitioner_b else float(st.session_state.get("practitioner_b_weight", 170.0)),
+                "fitness_level": loaded_practitioner_b.get("fitness_level") if "fitness_level" in loaded_practitioner_b else st.session_state.get("practitioner_b_fitness_level", "Average (30th-60th percentile)"),
+                "art": loaded_practitioner_b.get("art") if "art" in loaded_practitioner_b else st.session_state.get("practitioner_b_art", "None"),
+                "exp_level": loaded_practitioner_b.get("exp_level") if "exp_level" in loaded_practitioner_b else st.session_state.get("practitioner_b_exp_level", ""),
+                "sessions": loaded_practitioner_b.get("sessions") if "sessions" in loaded_practitioner_b else st.session_state.get("practitioner_b_sessions", 3),
+                "comp": loaded_practitioner_b.get("comp") if "comp" in loaded_practitioner_b else st.session_state.get("practitioner_b_comp", "None")
+            }
+            
+            # Get the fitness mapping for each practitioner
+            # This is a critical mapping - make sure it's correct and used consistently
+            fitness_level_mapping_table = {
+                "Below Average (<30th percentile)": 25,
+                "Average (30th-60th percentile)": 50,
+                "Above Average (61st-80th percentile)": 70,
+                "Notably Athletic (81st-95th percentile)": 88,
+                "Exceptional Athlete (>95th percentile)": 97
+            }
+            
+            # Log the exact fitness level string to help debug any mismatches
+            print(f"Practitioner A fitness level string: '{practitioner_a_data['fitness_level']}'")
+            practitioner_a_fitness = fitness_level_mapping_table.get(
+                practitioner_a_data["fitness_level"], 50  # Default to 50th percentile
+            )
+            print(f"Practitioner A fitness: {practitioner_a_fitness} from '{practitioner_a_data['fitness_level']}'")
+            
+            print(f"Practitioner B fitness level string: '{practitioner_b_data['fitness_level']}'")
+            practitioner_b_fitness = fitness_level_mapping_table.get(
+                practitioner_b_data["fitness_level"], 50  # Default to 50th percentile
+            )
+            print(f"Practitioner B fitness: {practitioner_b_fitness} from '{practitioner_b_data['fitness_level']}'")
+            
+            # If we have numeric values directly from loaded data, use those as a fallback
+            if practitioner_a_fitness == 50 and "loaded_practitioner_a" in st.session_state and "fitness" in st.session_state.loaded_practitioner_a:
+                direct_fitness = st.session_state.loaded_practitioner_a.get("fitness")
+                if direct_fitness:
+                    print(f"Using direct fitness value for A: {direct_fitness}")
+                    practitioner_a_fitness = direct_fitness
+                    
+            if practitioner_b_fitness == 50 and "loaded_practitioner_b" in st.session_state and "fitness" in st.session_state.loaded_practitioner_b:
+                direct_fitness = st.session_state.loaded_practitioner_b.get("fitness")
+                if direct_fitness:
+                    print(f"Using direct fitness value for B: {direct_fitness}")
+                    practitioner_b_fitness = direct_fitness
+            print(f"Practitioner B fitness: {practitioner_b_fitness} from {practitioner_b_data['fitness_level']}")
+            
+            # Create practitioner objects based on copied data
+            practitioner_a = PractitionerData(
+                name=practitioner_a_data["name"],
+                bjj_belt_rank=practitioner_a_data["belt"],
+                age_years=practitioner_a_data["age"],
+                weight_lbs=practitioner_a_data["weight"],
+                primary_occupation_activity_level="Moderately Active",
+                standardized_fitness_test_percentile_estimate=practitioner_a_fitness,
+                other_grappling_art_experience=(
+                    [{"art_name": practitioner_a_data["art"], 
+                      "experience_level_descriptor": practitioner_a_data["exp_level"]}] 
+                    if practitioner_a_data["art"] != "None" and practitioner_a_data["exp_level"]
+                    else []
+                ),
+                bjj_training_sessions_per_week=practitioner_a_data["sessions"],
+                bjj_competition_experience_level=practitioner_a_data["comp"],
+                practitioner_id="a"
+            )
+            
+            print(f"Created practitioner_a object: {practitioner_a}")
+            
+            practitioner_b = PractitionerData(
+                name=practitioner_b_data["name"],
+                bjj_belt_rank=practitioner_b_data["belt"],
+                age_years=practitioner_b_data["age"],
+                weight_lbs=practitioner_b_data["weight"],
+                primary_occupation_activity_level="Moderately Active",
+                standardized_fitness_test_percentile_estimate=practitioner_b_fitness,
+                other_grappling_art_experience=(
+                    [{"art_name": practitioner_b_data["art"], 
+                      "experience_level_descriptor": practitioner_b_data["exp_level"]}] 
+                    if practitioner_b_data["art"] != "None" and practitioner_b_data["exp_level"]
+                    else []
+                ),
+                bjj_training_sessions_per_week=practitioner_b_data["sessions"],
+                bjj_competition_experience_level=practitioner_b_data["comp"],
+                practitioner_id="b"
+            )
+            
+            print(f"Created practitioner_b object: {practitioner_b}")
+            
+            # Calculate factors and scores - recreate calculator for each calculation to avoid contamination
+            calculator_a = Calculator(st.session_state.config)
+            factors_a = calculator_a.calculate_all_factors(practitioner_a, practitioner_b)
+            hs_a = factors_a.calculate_handicapped_score()
+            
+            calculator_b = Calculator(st.session_state.config)  
+            factors_b = calculator_b.calculate_all_factors(practitioner_b, practitioner_a)
+            hs_b = factors_b.calculate_handicapped_score()
+            
+            print(f"Calculated scores - A: {hs_a}, B: {hs_b}")
+            
+            # Store in session state
+            st.session_state.score_a = hs_a
+            st.session_state.score_b = hs_b
+            st.session_state.factors_a = factors_a
+            st.session_state.factors_b = factors_b
+            
+            print("Scores updated in session state")
+            
+        except Exception as e:
+            print(f"Error updating scores: {e}")
+            import traceback
+            traceback.print_exc()
+            pass
+            
+        print("----- FINISHED UPDATING SCORES -----\n")
     
     # Initialize session state for saved practitioners if not exists
     if "saved_practitioners" not in st.session_state:
         st.session_state.saved_practitioners = load_practitioners_from_disk()
-    
+
+    # Track whether we need to update scores after loading
+    load_triggered = False
+
     # Add practitioner management UI
     with st.expander("Saved Practitioners", expanded=False):
         # Save current practitioner A or B
@@ -260,49 +650,16 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
             
         # Handle loading practitioners
         if load_a and selected_a:
-            practitioner_data = st.session_state.saved_practitioners[selected_a]
-            
-            # Load the selected practitioner into position A
-            st.session_state.practitioner_a_name = practitioner_data["name"]
-            st.session_state.practitioner_a_belt = practitioner_data["belt"]
-            st.session_state.practitioner_a_age = practitioner_data["age"]
-            st.session_state.practitioner_a_weight = practitioner_data["weight"]
-            st.session_state.practitioner_a_fitness = practitioner_data["fitness"]
-            st.session_state.practitioner_a_sessions = practitioner_data["sessions"]
-            st.session_state.practitioner_a_competition = practitioner_data["competition"]
-            
-            if "art" in practitioner_data:
-                st.session_state.practitioner_a_art = practitioner_data["art"]
-                if practitioner_data["art"] != "None" and "exp_level" in practitioner_data:
-                    st.session_state.practitioner_a_exp_level = practitioner_data["exp_level"]
-            
-            st.success(f"Loaded {selected_a} as Practitioner A")
-            st.rerun()
+            if load_practitioner_a(selected_a):
+                st.success(f"Loaded {selected_a} as Practitioner A")
+                load_triggered = True
             
         if load_b and selected_b:
-            practitioner_data = st.session_state.saved_practitioners[selected_b]
-            
-            # Load the selected practitioner into position B
-            st.session_state.practitioner_b_name = practitioner_data["name"]
-            st.session_state.practitioner_b_belt = practitioner_data["belt"]
-            st.session_state.practitioner_b_age = practitioner_data["age"]
-            st.session_state.practitioner_b_weight = practitioner_data["weight"]
-            st.session_state.practitioner_b_fitness = practitioner_data["fitness"]
-            st.session_state.practitioner_b_sessions = practitioner_data["sessions"]
-            st.session_state.practitioner_b_competition = practitioner_data["competition"]
-            
-            if "art" in practitioner_data:
-                st.session_state.practitioner_b_art = practitioner_data["art"]
-                if practitioner_data["art"] != "None" and "exp_level" in practitioner_data:
-                    st.session_state.practitioner_b_exp_level = practitioner_data["exp_level"]
-            
-            st.success(f"Loaded {selected_b} as Practitioner B")
-            st.rerun()
+            if load_practitioner_b(selected_b):
+                st.success(f"Loaded {selected_b} as Practitioner B")
+                load_triggered = True
     
-    # Create two columns for practitioner inputs
-    col1, col2 = st.columns(2)
-    
-    # Initialize placeholder scores in session state
+    # Initialize placeholder scores and state variables in session state
     if "score_a" not in st.session_state:
         st.session_state.score_a = 0
     if "score_b" not in st.session_state:
@@ -311,86 +668,49 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
         st.session_state.factors_a = None
     if "factors_b" not in st.session_state:
         st.session_state.factors_b = None
-        
-    # Define the fitness level mapping for score calculation
-    fitness_level_mapping = {
-        "Below Average (<30th percentile)": 25,
-        "Average (30th-60th percentile)": 50,
-        "Above Average (61st-80th percentile)": 70,
-        "Notably Athletic (81st-95th percentile)": 88,
-        "Exceptional Athlete (>95th percentile)": 97
-    }
     
-    # Function to calculate and display scores reactively
-    def update_scores():
-        try:
-            # Create a new calculator
-            calculator = Calculator(st.session_state.config)
-            
-            # Create practitioner objects based on current session state
-            practitioner_a = PractitionerData(
-                name=st.session_state.practitioner_a_name if "practitioner_a_name" in st.session_state else "",
-                bjj_belt_rank=st.session_state.practitioner_a_belt if "practitioner_a_belt" in st.session_state else "White",
-                age_years=st.session_state.practitioner_a_age if "practitioner_a_age" in st.session_state else 30,
-                weight_lbs=float(st.session_state.practitioner_a_weight) if "practitioner_a_weight" in st.session_state else 170.0,
-                primary_occupation_activity_level="Moderately Active",
-                standardized_fitness_test_percentile_estimate=(
-                    fitness_level_mapping[st.session_state.practitioner_a_fitness_level] 
-                    if "practitioner_a_fitness_level" in st.session_state else 50
-                ),
-                other_grappling_art_experience=(
-                    [{"art_name": st.session_state.practitioner_a_art, 
-                      "experience_level_descriptor": st.session_state.practitioner_a_exp_level}] 
-                    if "practitioner_a_art" in st.session_state and st.session_state.practitioner_a_art != "None" 
-                    else []
-                ),
-                bjj_training_sessions_per_week=st.session_state.practitioner_a_sessions if "practitioner_a_sessions" in st.session_state else 3,
-                bjj_competition_experience_level=st.session_state.practitioner_a_comp if "practitioner_a_comp" in st.session_state else "None",
-                practitioner_id="a"
-            )
-            
-            practitioner_b = PractitionerData(
-                name=st.session_state.practitioner_b_name if "practitioner_b_name" in st.session_state else "",
-                bjj_belt_rank=st.session_state.practitioner_b_belt if "practitioner_b_belt" in st.session_state else "White",
-                age_years=st.session_state.practitioner_b_age if "practitioner_b_age" in st.session_state else 30,
-                weight_lbs=float(st.session_state.practitioner_b_weight) if "practitioner_b_weight" in st.session_state else 170.0,
-                primary_occupation_activity_level="Moderately Active",
-                standardized_fitness_test_percentile_estimate=(
-                    fitness_level_mapping[st.session_state.practitioner_b_fitness_level] 
-                    if "practitioner_b_fitness_level" in st.session_state else 50
-                ),
-                other_grappling_art_experience=(
-                    [{"art_name": st.session_state.practitioner_b_art, 
-                      "experience_level_descriptor": st.session_state.practitioner_b_exp_level}] 
-                    if "practitioner_b_art" in st.session_state and st.session_state.practitioner_b_art != "None" 
-                    else []
-                ),
-                bjj_training_sessions_per_week=st.session_state.practitioner_b_sessions if "practitioner_b_sessions" in st.session_state else 3,
-                bjj_competition_experience_level=st.session_state.practitioner_b_comp if "practitioner_b_comp" in st.session_state else "None",
-                practitioner_id="b"
-            )
-            
-            # Calculate factors and scores
-            factors_a = calculator.calculate_all_factors(practitioner_a, practitioner_b)
-            hs_a = factors_a.calculate_handicapped_score()
-            
-            factors_b = calculator.calculate_all_factors(practitioner_b, practitioner_a)
-            hs_b = factors_b.calculate_handicapped_score()
-            
-            # Store in session state
-            st.session_state.score_a = hs_a
-            st.session_state.score_b = hs_b
-            st.session_state.factors_a = factors_a
-            st.session_state.factors_b = factors_b
-            
-            st.experimental_rerun()
-        except Exception as e:
-            print(f"Error updating scores: {e}")
-            pass
+    # Check if we're on a page that needs a rerun after loading
+    if "need_rerun" in st.session_state and st.session_state.need_rerun:
+        # Clear the flag and rerun
+        st.session_state.need_rerun = False
+        update_scores()
+        st.rerun()
+        
+    # Update scores if a practitioner was loaded
+    if load_triggered:
+        # Make sure our loaded values are preserved before updating scores
+        print("\n----- PRESERVING LOADED VALUES BEFORE UPDATE -----")
+        
+        # Always force values from loaded_practitioner_a and loaded_practitioner_b
+        # to override any potentially conflicting values in session state
+        if "loaded_practitioner_a" in st.session_state:
+            for field, value in st.session_state.loaded_practitioner_a.items():
+                field_key = f"practitioner_a_{field}"
+                print(f"Force restore field {field_key} with value {value}")
+                st.session_state[field_key] = value
+                
+        if "loaded_practitioner_b" in st.session_state:
+            for field, value in st.session_state.loaded_practitioner_b.items():
+                field_key = f"practitioner_b_{field}"
+                print(f"Force restore field {field_key} with value {value}")
+                st.session_state[field_key] = value
+                
+        print("----- FINISHED PRESERVING LOADED VALUES -----\n")
+        
+        # Now update scores with the preserved values
+        update_scores()
+        
+        # Set flag to force a rerun on the next page load
+        st.session_state.need_rerun = True
+        # Force a rerun to update the UI with the new scores
+        st.rerun()
     
     # Calculate initial scores if they haven't been calculated yet
     if st.session_state.score_a == 0 and st.session_state.score_b == 0:
         update_scores()
+    
+    # Create two columns for practitioner inputs
+    col1, col2 = st.columns(2)
     
     with col1:
         # Display score centered above the practitioner container
@@ -400,6 +720,13 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
             f'</div>',
             unsafe_allow_html=True
         )
+        
+        # Debug info
+        if st.checkbox("Show debug info A", key="debug_a", value=False):
+            st.write("### Session state for practitioner A")
+            a_state = {k: v for k, v in st.session_state.items() if k.startswith("practitioner_a_")}
+            st.write(a_state)
+            
         st.markdown('<div class="practitioner-heading">Practitioner A</div>', unsafe_allow_html=True)
         practitioner_a = render_practitioner_form("practitioner_a", st.session_state.config, 
                                                  score_factors=st.session_state.factors_a,
@@ -413,6 +740,13 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
             f'</div>',
             unsafe_allow_html=True
         )
+        
+        # Debug info
+        if st.checkbox("Show debug info B", key="debug_b", value=False):
+            st.write("### Session state for practitioner B")
+            b_state = {k: v for k, v in st.session_state.items() if k.startswith("practitioner_b_")}
+            st.write(b_state)
+            
         st.markdown('<div class="practitioner-heading">Practitioner B</div>', unsafe_allow_html=True)
         practitioner_b = render_practitioner_form("practitioner_b", st.session_state.config, 
                                                  score_factors=st.session_state.factors_b,
@@ -481,12 +815,95 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
         st.success(f"Practitioner '{save_name_b}' saved!")
     
     if compare_button:
-        # Calculate factors and HS for both
-        factors_a = calculator.calculate_all_factors(practitioner_a, practitioner_b)
-        hs_a = factors_a.calculate_handicapped_score()
+        # First update scores to ensure we have the most accurate data
+        update_scores()
         
-        factors_b = calculator.calculate_all_factors(practitioner_b, practitioner_a)
-        hs_b = factors_b.calculate_handicapped_score()
+        # Use the scores and factors from the update_scores function
+        factors_a = st.session_state.factors_a
+        hs_a = st.session_state.score_a
+        
+        factors_b = st.session_state.factors_b
+        hs_b = st.session_state.score_b
+        
+        # Recreate practitioner objects to ensure they match the scores
+        # Make a deep copy of the session state values for each practitioner
+        practitioner_a_data = {
+            "name": st.session_state.get("practitioner_a_name", ""),
+            "belt": st.session_state.get("practitioner_a_belt", "White"),
+            "age": st.session_state.get("practitioner_a_age", 30),
+            "weight": float(st.session_state.get("practitioner_a_weight", 170.0)),
+            "fitness_level": st.session_state.get("practitioner_a_fitness_level", "Average (30th-60th percentile)"),
+            "art": st.session_state.get("practitioner_a_art", "None"),
+            "exp_level": st.session_state.get("practitioner_a_exp_level", ""),
+            "sessions": st.session_state.get("practitioner_a_sessions", 3),
+            "comp": st.session_state.get("practitioner_a_comp", "None")
+        }
+        
+        practitioner_b_data = {
+            "name": st.session_state.get("practitioner_b_name", ""),
+            "belt": st.session_state.get("practitioner_b_belt", "White"),
+            "age": st.session_state.get("practitioner_b_age", 30),
+            "weight": float(st.session_state.get("practitioner_b_weight", 170.0)),
+            "fitness_level": st.session_state.get("practitioner_b_fitness_level", "Average (30th-60th percentile)"),
+            "art": st.session_state.get("practitioner_b_art", "None"),
+            "exp_level": st.session_state.get("practitioner_b_exp_level", ""),
+            "sessions": st.session_state.get("practitioner_b_sessions", 3),
+            "comp": st.session_state.get("practitioner_b_comp", "None")
+        }
+        
+        # Get the fitness mapping 
+        fitness_level_mapping_a = {
+            "Below Average (<30th percentile)": 25,
+            "Average (30th-60th percentile)": 50,
+            "Above Average (61st-80th percentile)": 70,
+            "Notably Athletic (81st-95th percentile)": 88,
+            "Exceptional Athlete (>95th percentile)": 97
+        }
+        
+        practitioner_a_fitness = fitness_level_mapping_a.get(
+            practitioner_a_data["fitness_level"], 50  # Default to 50th percentile
+        )
+        
+        practitioner_b_fitness = fitness_level_mapping_a.get(
+            practitioner_b_data["fitness_level"], 50  # Default to 50th percentile
+        )
+        
+        # Create practitioner objects based on copied data
+        practitioner_a = PractitionerData(
+            name=practitioner_a_data["name"],
+            bjj_belt_rank=practitioner_a_data["belt"],
+            age_years=practitioner_a_data["age"],
+            weight_lbs=practitioner_a_data["weight"],
+            primary_occupation_activity_level="Moderately Active",
+            standardized_fitness_test_percentile_estimate=practitioner_a_fitness,
+            other_grappling_art_experience=(
+                [{"art_name": practitioner_a_data["art"], 
+                  "experience_level_descriptor": practitioner_a_data["exp_level"]}] 
+                if practitioner_a_data["art"] != "None" and practitioner_a_data["exp_level"]
+                else []
+            ),
+            bjj_training_sessions_per_week=practitioner_a_data["sessions"],
+            bjj_competition_experience_level=practitioner_a_data["comp"],
+            practitioner_id="a"
+        )
+        
+        practitioner_b = PractitionerData(
+            name=practitioner_b_data["name"],
+            bjj_belt_rank=practitioner_b_data["belt"],
+            age_years=practitioner_b_data["age"],
+            weight_lbs=practitioner_b_data["weight"],
+            primary_occupation_activity_level="Moderately Active",
+            standardized_fitness_test_percentile_estimate=practitioner_b_fitness,
+            other_grappling_art_experience=(
+                [{"art_name": practitioner_b_data["art"], 
+                  "experience_level_descriptor": practitioner_b_data["exp_level"]}] 
+                if practitioner_b_data["art"] != "None" and practitioner_b_data["exp_level"]
+                else []
+            ),
+            bjj_training_sessions_per_week=practitioner_b_data["sessions"],
+            bjj_competition_experience_level=practitioner_b_data["comp"],
+            practitioner_id="b"
+        )
         
         # Generate profiles
         profile_a = profile_generator.generate_profile(practitioner_a, factors_a, hs_a)

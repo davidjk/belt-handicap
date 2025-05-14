@@ -17,23 +17,68 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
     Returns:
         Populated PractitionerData object
     """
+    # Add debugging logging
+    print(f"\n----- RENDERING FORM FOR {key_prefix} -----")
+    
+    # Log all session state variables for this practitioner
+    print(f"Session state for {key_prefix} at form render start:")
+    for key in st.session_state:
+        if key.startswith(f"{key_prefix}_"):
+            print(f"  {key}: {st.session_state[key]}")
+            
+    # Create a wrapper method to prevent callbacks from other forms from triggering updates
+    # This is important to prevent cross-contamination
+    def wrapped_on_change():
+        print(f"Change detected in {key_prefix} form")
+        if on_change:
+            on_change()
+    
+    # Check if we have loaded practitioner data that might need restoring
+    # Always restore loaded values to ensure consistency
+    loaded_key = f"loaded_{key_prefix}"
+    if loaded_key in st.session_state:
+        load_data = st.session_state[loaded_key]
+        for field, value in load_data.items():
+            field_key = f"{key_prefix}_{field}"
+            # Always restore values to ensure they're not lost during form rendering
+            # This is vital to prevent cross-contamination between practitioners
+            print(f"Restoring field {field_key} with value {value}")
+            st.session_state[field_key] = value
+            
     # Initialize session state for form fields if they don't exist
-    if f"{key_prefix}_name" not in st.session_state:
-        st.session_state[f"{key_prefix}_name"] = ""
-    if f"{key_prefix}_belt" not in st.session_state:
-        st.session_state[f"{key_prefix}_belt"] = "White"
-    if f"{key_prefix}_age" not in st.session_state:
-        st.session_state[f"{key_prefix}_age"] = 30
-    if f"{key_prefix}_weight" not in st.session_state:
-        st.session_state[f"{key_prefix}_weight"] = 170
-    if f"{key_prefix}_fitness_level" not in st.session_state:
-        st.session_state[f"{key_prefix}_fitness_level"] = "Average (30th-60th percentile)"
-    if f"{key_prefix}_sessions" not in st.session_state:
-        st.session_state[f"{key_prefix}_sessions"] = 3
-    if f"{key_prefix}_comp" not in st.session_state:
-        st.session_state[f"{key_prefix}_comp"] = "None"
-    if f"{key_prefix}_art" not in st.session_state:
-        st.session_state[f"{key_prefix}_art"] = "None"
+    # We're keeping the initialization separate for each form field to avoid
+    # cross-contamination between practitioners
+    field_key = f"{key_prefix}_name"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = ""
+        
+    field_key = f"{key_prefix}_belt"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = "White"
+        
+    field_key = f"{key_prefix}_age"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = 30
+        
+    field_key = f"{key_prefix}_weight"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = 170
+        
+    field_key = f"{key_prefix}_fitness_level"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = "Average (30th-60th percentile)"
+        
+    field_key = f"{key_prefix}_sessions"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = 3
+        
+    field_key = f"{key_prefix}_comp"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = "None"
+        
+    field_key = f"{key_prefix}_art"
+    if field_key not in st.session_state:
+        st.session_state[field_key] = "None"
         
     # Basic info
     name = st.text_input(
@@ -49,7 +94,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         options=belt_options,
         index=belt_options.index(st.session_state[f"{key_prefix}_belt"]) if st.session_state[f"{key_prefix}_belt"] in belt_options else 0,
         key=f"{key_prefix}_belt",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     
     # Show base score for belt rank
@@ -88,7 +133,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         max_value=70, 
         value=st.session_state[f"{key_prefix}_age"],
         key=f"{key_prefix}_age",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     st.markdown("""</div>""", unsafe_allow_html=True)
     if score_factors:
@@ -103,7 +148,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         value=st.session_state[f"{key_prefix}_weight"],
         step=5,
         key=f"{key_prefix}_weight",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     st.markdown("""</div>""", unsafe_allow_html=True)
     if score_factors:
@@ -127,7 +172,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         max_value=5,
         value=fitness_level_index + 1,
         key=f"{key_prefix}_fitness_numeric",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     
     # Convert numeric value to the text option
@@ -148,7 +193,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         max_value=10,
         value=st.session_state[f"{key_prefix}_sessions"],
         key=f"{key_prefix}_sessions",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     st.markdown("""</div>""", unsafe_allow_html=True)
     if score_factors:
@@ -176,7 +221,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         options=competition_options,
         index=competition_options.index(st.session_state[f"{key_prefix}_comp"]) if st.session_state[f"{key_prefix}_comp"] in competition_options else 0,
         key=f"{key_prefix}_comp",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     
     # Show competition experience impact
@@ -199,7 +244,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
         options=art_options,
         index=art_options.index(st.session_state[f"{key_prefix}_art"]) if st.session_state[f"{key_prefix}_art"] in art_options else 0,
         key=f"{key_prefix}_art",
-        on_change=on_change if on_change else None
+        on_change=wrapped_on_change if on_change else None
     )
     
     # Show grappling experience impact
@@ -241,7 +286,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
                 options=experience_options,
                 index=experience_options.index(st.session_state[f"{key_prefix}_exp_level"]) if st.session_state[f"{key_prefix}_exp_level"] in experience_options else 0,
                 key=f"{key_prefix}_exp_level",
-                on_change=on_change if on_change else None
+                on_change=wrapped_on_change if on_change else None
             )
         
         with col2:
@@ -282,6 +327,15 @@ def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=N
             bjj_competition_experience_level=competition_level,
             practitioner_id=practitioner_id
         )
+        
+        # Log session state after form rendering is complete
+        print(f"\nSession state for {key_prefix} at form render END:")
+        for key in st.session_state:
+            if key.startswith(f"{key_prefix}_"):
+                print(f"  {key}: {st.session_state[key]}")
+                
+        print(f"Returning PractitionerData for {key_prefix}: {practitioner_data}")
+        print(f"----- FINISHED RENDERING FORM FOR {key_prefix} -----\n")
         
         return practitioner_data
         

@@ -39,13 +39,13 @@ class PractitionerData:
     def __post_init__(self):
         # Validate ranges
         if not 16 <= self.age_years <= 90:
-            raise ValueError("Age must be between 16 and 90")
+            raise ValueError(f"Age must be between 16 and 90 (got {self.age_years})")
         if not 80 <= self.weight_lbs <= 400:
-            raise ValueError("Weight must be between 80 and 400 lbs")
+            raise ValueError(f"Weight must be between 80 and 400 lbs (got {self.weight_lbs})")
         if not 0 <= self.standardized_fitness_test_percentile_estimate <= 100:
-            raise ValueError("Fitness percentile must be between 0 and 100")
+            raise ValueError(f"Fitness percentile must be between 0 and 100 (got {self.standardized_fitness_test_percentile_estimate})")
         if not 0 <= self.bjj_training_sessions_per_week <= 14:
-            raise ValueError("Training sessions must be between 0 and 14 per week")
+            raise ValueError(f"Training sessions must be between 0 and 14 per week (got {self.bjj_training_sessions_per_week})")
 
 # Factor calculation results
 @dataclass
