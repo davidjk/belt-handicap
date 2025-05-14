@@ -13,270 +13,70 @@ def main():
     """
     Main Streamlit application entry point.
     """
+    # Configure the page with built-in dark theme
     st.set_page_config(
         page_title="JAR System",
         page_icon="🥋",
         layout="wide",
         initial_sidebar_state="expanded",
+        menu_items={
+            'About': "# JAR System\nJiu-Jitsu Attribute Rating for comparing practitioners"
+        }
     )
     
-    # Add the dark theme configuration to session state for persistence
-    if "css_injected" not in st.session_state:
-        st.session_state.css_injected = True
+    # Use Streamlit's built-in theming with minimal customizations
+    st.markdown("""
+    <style>
+    /* Custom styles that preserve the built-in dark theme while adding our specific UI needs */
+    .section-title {
+        font-size: 1.8em;
+        font-weight: 500;
+        margin: 1.5rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(250, 250, 250, 0.2);
+    }
     
-        # Set dark theme CSS
-        st.markdown("""
-        <style>
-        /* Modern, harmonious color palette optimized for dark theme */
-        html {
-            --primary-color: #4f92d3;
-            --primary-light: rgba(79, 146, 211, 0.15);
-            --accent-positive: #4db380;
-            --accent-positive-light: rgba(77, 179, 128, 0.15);
-            --accent-negative: #e05a45;
-            --accent-negative-light: rgba(224, 90, 69, 0.15);
-            --accent-neutral: #d8b24b;
-            --accent-neutral-light: rgba(216, 178, 75, 0.15);
-            --text-bright: #e9ecef;
-            --text-medium: #adb5bd;
-            --text-dim: #6c757d;
-            --border-color: #495057;
-            --background-main: #1a1a1a;
-            --background-card: #222222;
-            --background-elevated: #2a2a2a;
-            --background-highlight: #333333;
-        }
-        
-        /* Force dark theme on all elements */
-        body {
-            background-color: #1a1a1a !important;
-            color: #e9ecef !important;
-        }
-        
-        /* Global styles for dark theme */
-        .main, .stApp, .css-18e3th9, .css-1d391kg, [data-testid="stAppViewContainer"], 
-        [data-testid="stAppViewContainer"] .main {
-            background-color: #1a1a1a !important;
-            color: #e9ecef !important;
-        }
-        
-        /* Forcefully override light theme and make all content containers dark */
-        div.stBlock, div.row-widget, div.block-container, div.element-container, div.stTabs,
-        div[data-testid="stDecoration"], div[data-testid="stToolbar"], div[data-testid="baseButton-secondary"],
-        div.stToolbar, div[data-testid="stHeader"], [data-testid="stHeader"],
-        div[data-testid="stVerticalBlock"], div[data-testid="stHorizontalBlock"] {
-            background-color: #1a1a1a !important;
-            border-color: #495057 !important;
-            color: #e9ecef !important;
-        }
-        
-        /* All form inputs and containers match the dark theme */
-        .stTextInput input, 
-        .stNumberInput input, 
-        .stSelectbox > div,
-        .stSlider > div,
-        .stTextArea textarea,
-        div[data-baseweb="select"] > div,
-        div[data-baseweb="base-input"],
-        [data-baseweb="input"] input {
-            background-color: #2a2a2a !important;
-            border: 1px solid #495057 !important;
-            border-radius: 6px !important;
-            color: #e9ecef !important;
-        }
-        
-        /* Make select dropdown styling nicer in dark theme */
-        div[data-baseweb="select"] > div,
-        div[role="listbox"],
-        div[data-baseweb="menu"],
-        div[data-baseweb="popover"],
-        div[role="option"] {
-            background-color: #2a2a2a !important;
-            color: #e9ecef !important;
-            border-color: #495057 !important;
-        }
-        
-        div[data-baseweb="popover"] div {
-            background-color: #2a2a2a !important;
-            color: #e9ecef !important;
-        }
-        
-        div[data-testid="stMarkdownContainer"] > div {
-            background-color: transparent !important;
-        }
-        
-        /* Consistent form heading styles */
-        h1, h2, h3, .css-10trblm, .css-zt5igj {
-            color: #4f92d3 !important;
-            font-weight: 500 !important;
-        }
-        
-        h4, h5, h6 {
-            color: #e9ecef !important;
-            font-weight: 500 !important;
-        }
-        
-        /* Override the stSubheader styling for dark theme */
-        div[data-testid="stSubheader"] {
-            color: #adb5bd !important;
-            font-weight: 500 !important;
-            font-size: 1.1rem !important;
-            padding-top: 0.5rem !important;
-            margin-bottom: 1rem !important;
-        }
-        
-        /* Better styled tabs */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 24px !important;
-            border-bottom: 1px solid #495057 !important;
-            background-color: #1a1a1a !important;
-        }
-        
-        .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-            color: #adb5bd !important;
-        }
-        
-        .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] [data-testid="stMarkdownContainer"] p {
-            color: #4f92d3 !important;
-        }
-        
-        /* Better buttons */
-        .stButton > button {
-            background-color: #4f92d3 !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 0.6rem 1.7rem !important;
-            font-weight: 500 !important;
-            transition: all 0.2s !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
-        }
-        
-        .stButton > button:hover {
-            background-color: #3d77b0 !important;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
-        }
-        
-        /* Make slider thumbs visible in dark theme */
-        .stSlider [data-baseweb="slider"] div[role="slider"] {
-            background-color: #4f92d3 !important;
-            border-color: #4f92d3 !important;
-        }
-        
-        /* Make slider rails match theme */
-        .stSlider [data-baseweb="slider"] div {
-            background-color: #495057 !important;
-        }
-        
-        .stSlider [data-baseweb="slider"] div[role="progressbar"] {
-            background-color: #4f92d3 !important;
-        }
-        
-        /* Add light separator borders around interface sections */
-        .interface-section {
-            border-bottom: 1px solid #495057 !important;
-            padding-bottom: 1.5rem !important;
-            margin-bottom: 1.5rem !important;
-        }
-        
-        /* Custom header format for section titles in dark theme */
-        .section-title {
-            font-size: 1.8em !important;
-            font-weight: 500 !important;
-            margin: 1.5rem 0 1rem 0 !important;
-            padding-bottom: 0.5rem !important;
-            border-bottom: 1px solid #495057 !important;
-            color: #4f92d3 !important;
-            background-color: #1a1a1a !important;
-        }
-        
-        /* Practitioner heading styles */
-        .practitioner-heading {
-            color: #adb5bd !important;
-            font-size: 1.2rem !important;
-            font-weight: 400 !important;
-            letter-spacing: 0.5px !important;
-            border-bottom: none !important;
-            padding-bottom: 0.5rem !important;
-            margin-bottom: 1rem !important;
-            background-color: #1a1a1a !important;
-        }
-        
-        /* Fix for information boxes */
-        .info-box {
-            background-color: #2a2a2a !important;
-            border: 1px solid #495057 !important;
-            color: #adb5bd !important;
-            padding: 12px !important;
-            border-radius: 6px !important;
-            margin: 10px 0 !important;
-        }
-        
-        /* Make expanders match theme */
-        .streamlit-expanderHeader {
-            background-color: #2a2a2a !important;
-            color: #adb5bd !important;
-        }
-        
-        .streamlit-expanderContent {
-            background-color: #222222 !important;
-            border-top: 1px solid #495057 !important;
-            color: #e9ecef !important;
-        }
-        
-        /* Add consistent form field height and spacing */
-        .form-field-container {
-            margin-bottom: 1.2rem !important;
-        }
-        
-        /* Create wrapper for same-height sliders */
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            height: 80px;
-        }
-        
-        /* Fix any white text on white background issues */
-        div.stMarkdown, div.stText, p, span, div {
-            color: #e9ecef !important;
-            background-color: transparent !important;
-        }
-        
-        /* Fix matplotlib outputs */
-        .stMarkdown img, [data-testid="stImage"] img {
-            background-color: #222222 !important;
-        }
-        
-        /* Fix dataframes */
-        .dataframe {
-            color: #e9ecef !important;
-        }
-        
-        .dataframe tbody tr {
-            background-color: #222222 !important;
-        }
-        
-        .dataframe tbody tr:nth-child(odd) {
-            background-color: #2a2a2a !important;
-        }
-        
-        .dataframe thead tr {
-            background-color: #333333 !important;
-        }
-        
-        /* Fix metric */
-        [data-testid="stMetricValue"] {
-            background-color: transparent !important;
-            color: #4f92d3 !important;
-            font-weight: bold !important;
-        }
-        
-        /* Force our dark theme on all elements, including ones added later */
-        *, *:before, *:after {
-            color-scheme: dark !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+    .practitioner-heading {
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: rgba(250, 250, 250, 0.6);
+        letter-spacing: 0.5px;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Create wrapper for same-height sliders */
+    .slider-container {
+        display: flex;
+        flex-direction: column;
+        height: 80px;
+    }
+    
+    /* Styles for profile assessment items */
+    .assessment-item {
+        transition: transform 0.2s;
+    }
+    
+    .assessment-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Make expanders and info boxes consistent with theme */
+    .streamlit-expanderContent {
+        border-top: 1px solid rgba(250, 250, 250, 0.2);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Activate dark mode
+    st.markdown("""
+        <script>
+            var elements = window.parent.document.querySelectorAll('.sidebar-content');
+            var theme = elements[elements.length - 1];
+            theme.click();
+            theme.children[0].click();
+        </script>
+    """, unsafe_allow_html=True)
     
     st.title("Jiu-Jitsu Attribute Rating (JAR) System")
     
@@ -453,7 +253,7 @@ def about_view():
     """)
     
     st.image("https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80", 
-             caption="Brazilian Jiu-Jitsu training", use_column_width=True)
+             caption="Brazilian Jiu-Jitsu training", use_container_width=True)
     
     st.markdown("""
     ### How to Use This App:

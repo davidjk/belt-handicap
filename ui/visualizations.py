@@ -233,12 +233,19 @@ def render_practitioner_radar(factors: FactorResults) -> None:
     # Extend values arrays to close the loop
     values += values[:1]
     
-    # Create the figure with larger size and updated style
+    # Create the figure with larger size and dark theme style
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
     
-    # Set background color to match the app's aesthetic
-    fig.patch.set_facecolor('#f8f9fa')
-    ax.set_facecolor('#ffffff')
+    # Set background color to match the dark theme
+    fig.patch.set_facecolor('#1e1e1e')
+    ax.set_facecolor('#2a2a2a')
+    
+    # Set text colors for better visibility in dark mode
+    for label in ax.get_xticklabels():
+        label.set_color('#e9ecef')
+    for label in ax.get_yticklabels():
+        label.set_color('#e9ecef')
+    ax.title.set_color('#e9ecef')
     
     # Draw the radar chart with thicker lines and clearer markers
     ax.plot(angles, values, 'o-', linewidth=3, markersize=10, 
@@ -257,9 +264,9 @@ def render_practitioner_radar(factors: FactorResults) -> None:
         ax.plot(angles, [level] * len(angles), '--', color='#dee2e6', 
                 alpha=0.5, linewidth=1)
     
-    # Customize grid and axes
-    ax.grid(color='#e9ecef', alpha=0.7)
-    ax.spines['polar'].set_color('#dee2e6')
+    # Customize grid and axes for dark theme
+    ax.grid(color='#495057', alpha=0.7)
+    ax.spines['polar'].set_color('#495057')
     
     # Add factor descriptions at each point
     for i, (angle, value, category) in enumerate(zip(angles[:-1], values[:-1], categories)):
@@ -270,7 +277,7 @@ def render_practitioner_radar(factors: FactorResults) -> None:
         ax.text(angle, value + 0.1, f"{value:.2f}", 
                 ha=ha, va=va, color='#495057', fontweight='bold')
     
-    plt.title('Practitioner Attribute Profile', size=20, pad=20, color='#343a40')
+    plt.title('Practitioner Attribute Profile', size=20, pad=20, color='#e9ecef')
     
     # Show the plot
     st.pyplot(fig)
@@ -358,8 +365,17 @@ def render_waterfall_chart(factors: FactorResults, final_score: float) -> None:
         contributions[k] = new_value - current_value
         current_value = new_value
     
-    # Create the figure with larger size
+    # Create the figure with larger size and dark background
     fig, ax = plt.subplots(figsize=(14, 9))
+    fig.patch.set_facecolor('#1e1e1e')
+    ax.set_facecolor('#2a2a2a')
+    
+    # Update text color for better visibility in dark mode
+    ax.xaxis.label.set_color('#e9ecef')
+    ax.yaxis.label.set_color('#e9ecef')
+    ax.tick_params(axis='x', colors='#e9ecef')
+    ax.tick_params(axis='y', colors='#e9ecef')
+    ax.title.set_color('#e9ecef')
     
     # Start with BRS
     values = [base_value] + list(contributions.values()) + [final_score]
@@ -479,38 +495,41 @@ def render_factor_breakdown_table(factors: FactorResults, final_score: float) ->
         'Impact': 'N/A'
     }])], ignore_index=True)
     
-    # Style the dataframe for display with better readability
+    # Style the dataframe for display with better dark theme readability
     styled_df = df.style.format({
         'Value': lambda x: f"{x:.2f}" if isinstance(x, float) else x,
     }).set_table_styles([
         # Increase font size and padding for all cells
-        {'selector': '*', 'props': [('font-size', '16px'), ('padding', '10px')]},
+        {'selector': '*', 'props': [('font-size', '16px'), ('padding', '10px'), ('color', '#e9ecef')]},
         # Bold headers
         {'selector': 'th', 'props': [
             ('font-weight', 'bold'), 
             ('text-align', 'left'),
-            ('background-color', '#f2f2f2'),
-            ('font-size', '18px')
+            ('background-color', '#333333'),
+            ('font-size', '18px'),
+            ('color', '#e9ecef')
         ]},
         # Style cells
         {'selector': 'td', 'props': [
             ('text-align', 'left'),
-            ('font-size', '16px')
+            ('font-size', '16px'),
+            ('background-color', '#2a2a2a')
         ]},
         # Add borders
         {'selector': 'table', 'props': [
-            ('border', '2px solid #666'),
-            ('border-collapse', 'collapse')
+            ('border', '2px solid #495057'),
+            ('border-collapse', 'collapse'),
+            ('background-color', '#2a2a2a')
         ]},
         {'selector': 'th, td', 'props': [
-            ('border', '1px solid #ddd')
+            ('border', '1px solid #495057')
         ]}
     ]).apply(lambda x: [
         # Apply custom cell styling for values instead of background gradient
-        'font-weight: bold; color: #006600;' if x.name == 'Final Handicapped Score' else
-        'font-weight: bold; color: #006600;' if not isinstance(x['Value'], str) and x['Value'] > 1.0 else
-        'font-weight: bold; color: #990000;' if not isinstance(x['Value'], str) and x['Value'] < 1.0 else
-        'font-weight: normal; color: #333333;',
+        'font-weight: bold; color: #4db380;' if x.name == 'Final Handicapped Score' else
+        'font-weight: bold; color: #4db380;' if not isinstance(x['Value'], str) and x['Value'] > 1.0 else
+        'font-weight: bold; color: #e05a45;' if not isinstance(x['Value'], str) and x['Value'] < 1.0 else
+        'font-weight: normal; color: #e9ecef;',
         '' if isinstance(x['Value'], str) else
         'font-weight: bold;' if x.name == 7 else  # Final score row
         '',
@@ -587,8 +606,17 @@ def render_factor_comparison_chart(
     
     df = pd.DataFrame(data)
     
-    # Create the comparison chart with larger size
+    # Create the comparison chart with larger size and dark background
     fig, ax = plt.subplots(figsize=(14, 10))
+    fig.patch.set_facecolor('#1e1e1e')
+    ax.set_facecolor('#2a2a2a')
+    
+    # Update text color for better visibility in dark mode
+    ax.xaxis.label.set_color('#e9ecef')
+    ax.yaxis.label.set_color('#e9ecef')
+    ax.tick_params(axis='x', colors='#e9ecef')
+    ax.tick_params(axis='y', colors='#e9ecef')
+    ax.title.set_color('#e9ecef')
     
     # Get positions for bars
     x = np.arange(len(df))
@@ -681,8 +709,17 @@ def render_radar_chart(factors_a: FactorResults, factors_b: FactorResults) -> No
     values_a += values_a[:1]
     values_b += values_b[:1]
     
-    # Create the figure with larger size
+    # Create the figure with larger size and dark background
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
+    fig.patch.set_facecolor('#1e1e1e')
+    ax.set_facecolor('#2a2a2a')
+    
+    # Set text color for better visibility in dark mode
+    for label in ax.get_xticklabels():
+        label.set_color('#e9ecef')
+    for label in ax.get_yticklabels():
+        label.set_color('#e9ecef')
+    ax.title.set_color('#e9ecef')
     
     # Draw the radar chart with thicker lines and clearer markers
     ax.plot(angles, values_a, 'o-', linewidth=3, markersize=8, label='Practitioner A', color='#3366cc')
@@ -737,7 +774,7 @@ def render_radar_chart(factors_a: FactorResults, factors_b: FactorResults) -> No
     ax.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
     
     # Add title
-    plt.title('Practitioner Attributes Comparison', size=20, y=1.05)
+    plt.title('Practitioner Attributes Comparison', size=20, y=1.05, color='#e9ecef')
     
     # Show the plot
     st.pyplot(fig)
