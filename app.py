@@ -88,6 +88,55 @@ def main():
         except (FileNotFoundError, ValueError) as e:
             st.error(f"Error loading configuration: {e}")
             return
+            
+    # Setup for persistent storage of saved practitioners
+    practitioners_path = os.path.join(os.path.dirname(__file__), "data", "saved_practitioners.json")
+    
+    # Function to save practitioners to disk
+    def save_practitioners_to_disk():
+        try:
+            # Ensure data directory exists
+            data_dir = os.path.join(os.path.dirname(__file__), "data")
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+                
+            # Convert dict keys to strings to ensure JSON serialization works
+            serializable_practitioners = {}
+            for key, value in st.session_state.saved_practitioners.items():
+                serializable_practitioners[str(key)] = value
+                
+            with open(practitioners_path, 'w') as f:
+                json.dump(serializable_practitioners, f, indent=2)
+        except Exception as e:
+            st.error(f"Error saving practitioners: {e}")
+    
+    # Function to load practitioners from disk
+    def load_practitioners_from_disk():
+        try:
+            if os.path.exists(practitioners_path):
+                with open(practitioners_path, 'r') as f:
+                    loaded_practitioners = json.load(f)
+                    # Log successful load
+                    print(f"Successfully loaded {len(loaded_practitioners)} saved practitioners")
+                    return loaded_practitioners
+            else:
+                print("No saved practitioners file found, starting with empty practitioners")
+            return {}
+        except json.JSONDecodeError as e:
+            print(f"Error decoding saved practitioners JSON: {e}")
+            # If the file is corrupted, create a backup
+            if os.path.exists(practitioners_path):
+                backup_path = practitioners_path + ".backup"
+                try:
+                    import shutil
+                    shutil.copy2(practitioners_path, backup_path)
+                    print(f"Created backup of corrupted practitioners file at {backup_path}")
+                except Exception as backup_error:
+                    print(f"Failed to create backup: {backup_error}")
+            return {}
+        except Exception as e:
+            print(f"Error loading saved practitioners: {e}")
+            return {}
     
     # Create core system components
     calculator = Calculator(st.session_state.config)
@@ -118,55 +167,122 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
     st.markdown('<div class="section-title">JAR System Analysis</div>', unsafe_allow_html=True)
     
     # Initialize session state for saved practitioners if not exists
-    if "saved_pairs" not in st.session_state:
-        st.session_state.saved_pairs = {}
+    if "saved_practitioners" not in st.session_state:
+        st.session_state.saved_practitioners = load_practitioners_from_disk()
     
-    # Add pair management UI
-    with st.expander("Saved Practitioner Pairs", expanded=False):
-        col1, col2, col3 = st.columns([3, 1, 1])
+    # Add practitioner management UI
+    with st.expander("Saved Practitioners", expanded=False):
+        # Save current practitioner A or B
+        st.subheader("Save Current Practitioners")
+        col1, col2 = st.columns(2)
         
         with col1:
-            pair_name = st.text_input("Pair Name", key="new_pair_name")
+            st.write("Practitioner A")
+            save_name_a = st.text_input("Name for Practitioner A", 
+                                        value=st.session_state.practitioner_a_name if "practitioner_a_name" in st.session_state else "", 
+                                        key="save_name_a")
+            save_a = st.button("Save Practitioner A")
         
         with col2:
-            save_pair = st.button("Save Current")
+            st.write("Practitioner B")
+            save_name_b = st.text_input("Name for Practitioner B", 
+                                       value=st.session_state.practitioner_b_name if "practitioner_b_name" in st.session_state else "", 
+                                       key="save_name_b")
+            save_b = st.button("Save Practitioner B")
         
-        with col3:
-            clear_pairs = st.button("Clear All")
-            
-        # Display saved pairs for selection
-        if st.session_state.saved_pairs:
-            selected_pair = st.selectbox(
-                "Select a saved pair",
-                options=[""] + list(st.session_state.saved_pairs.keys()),
-                index=0
-            )
-            
-            if selected_pair and st.button("Load Selected Pair"):
-                # Load the selected pair into the form
-                st.session_state.practitioner_a_name = st.session_state.saved_pairs[selected_pair]["a"]["name"]
-                st.session_state.practitioner_a_belt = st.session_state.saved_pairs[selected_pair]["a"]["belt"]
-                st.session_state.practitioner_a_age = st.session_state.saved_pairs[selected_pair]["a"]["age"]
-                st.session_state.practitioner_a_weight = st.session_state.saved_pairs[selected_pair]["a"]["weight"]
-                st.session_state.practitioner_a_fitness = st.session_state.saved_pairs[selected_pair]["a"]["fitness"]
-                st.session_state.practitioner_a_sessions = st.session_state.saved_pairs[selected_pair]["a"]["sessions"]
-                st.session_state.practitioner_a_competition = st.session_state.saved_pairs[selected_pair]["a"]["competition"]
-                
-                st.session_state.practitioner_b_name = st.session_state.saved_pairs[selected_pair]["b"]["name"]
-                st.session_state.practitioner_b_belt = st.session_state.saved_pairs[selected_pair]["b"]["belt"]
-                st.session_state.practitioner_b_age = st.session_state.saved_pairs[selected_pair]["b"]["age"]
-                st.session_state.practitioner_b_weight = st.session_state.saved_pairs[selected_pair]["b"]["weight"]
-                st.session_state.practitioner_b_fitness = st.session_state.saved_pairs[selected_pair]["b"]["fitness"]
-                st.session_state.practitioner_b_sessions = st.session_state.saved_pairs[selected_pair]["b"]["sessions"]
-                st.session_state.practitioner_b_competition = st.session_state.saved_pairs[selected_pair]["b"]["competition"]
-                
-                st.rerun()
+        # Horizontal separator
+        st.markdown("---")
         
-        if not st.session_state.saved_pairs:
-            st.info("No saved pairs yet. Fill out both forms and save them.")
+        # Load saved practitioners
+        st.subheader("Load Saved Practitioners")
+        
+        saved_practitioners = list(st.session_state.saved_practitioners.keys())
+        if saved_practitioners:
+            col1, col2 = st.columns(2)
             
-        if clear_pairs:
-            st.session_state.saved_pairs = {}
+            with col1:
+                st.write("Select for Position A")
+                selected_a = st.selectbox(
+                    "Load into position A",
+                    options=[""] + saved_practitioners,
+                    index=0,
+                    key="selected_a"
+                )
+                load_a = st.button("Load as A")
+            
+            with col2:
+                st.write("Select for Position B")
+                selected_b = st.selectbox(
+                    "Load into position B",
+                    options=[""] + saved_practitioners,
+                    index=0,
+                    key="selected_b"
+                )
+                load_b = st.button("Load as B")
+            
+            # Delete practitioner
+            st.markdown("---")
+            col1, col2 = st.columns([3, 1])
+            
+            with col1:
+                to_delete = st.selectbox(
+                    "Select practitioner to delete",
+                    options=[""] + saved_practitioners,
+                    index=0,
+                    key="to_delete"
+                )
+            
+            with col2:
+                delete_btn = st.button("Delete", type="primary", use_container_width=True)
+                
+            if delete_btn and to_delete:
+                if to_delete in st.session_state.saved_practitioners:
+                    del st.session_state.saved_practitioners[to_delete]
+                    save_practitioners_to_disk()
+                    st.success(f"Deleted practitioner: {to_delete}")
+                    st.rerun()
+        else:
+            st.info("No saved practitioners yet. Fill out the forms and save them individually.")
+            
+        # Handle loading practitioners
+        if load_a and selected_a:
+            practitioner_data = st.session_state.saved_practitioners[selected_a]
+            
+            # Load the selected practitioner into position A
+            st.session_state.practitioner_a_name = practitioner_data["name"]
+            st.session_state.practitioner_a_belt = practitioner_data["belt"]
+            st.session_state.practitioner_a_age = practitioner_data["age"]
+            st.session_state.practitioner_a_weight = practitioner_data["weight"]
+            st.session_state.practitioner_a_fitness = practitioner_data["fitness"]
+            st.session_state.practitioner_a_sessions = practitioner_data["sessions"]
+            st.session_state.practitioner_a_competition = practitioner_data["competition"]
+            
+            if "art" in practitioner_data:
+                st.session_state.practitioner_a_art = practitioner_data["art"]
+                if practitioner_data["art"] != "None" and "exp_level" in practitioner_data:
+                    st.session_state.practitioner_a_exp_level = practitioner_data["exp_level"]
+            
+            st.success(f"Loaded {selected_a} as Practitioner A")
+            st.rerun()
+            
+        if load_b and selected_b:
+            practitioner_data = st.session_state.saved_practitioners[selected_b]
+            
+            # Load the selected practitioner into position B
+            st.session_state.practitioner_b_name = practitioner_data["name"]
+            st.session_state.practitioner_b_belt = practitioner_data["belt"]
+            st.session_state.practitioner_b_age = practitioner_data["age"]
+            st.session_state.practitioner_b_weight = practitioner_data["weight"]
+            st.session_state.practitioner_b_fitness = practitioner_data["fitness"]
+            st.session_state.practitioner_b_sessions = practitioner_data["sessions"]
+            st.session_state.practitioner_b_competition = practitioner_data["competition"]
+            
+            if "art" in practitioner_data:
+                st.session_state.practitioner_b_art = practitioner_data["art"]
+                if practitioner_data["art"] != "None" and "exp_level" in practitioner_data:
+                    st.session_state.practitioner_b_exp_level = practitioner_data["exp_level"]
+            
+            st.success(f"Loaded {selected_b} as Practitioner B")
             st.rerun()
     
     # Create two columns for practitioner inputs
@@ -290,29 +406,65 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
     
     compare_button = st.button("Compare Practitioners")
     
-    # Save the current pair if requested
-    if save_pair and pair_name:
-        st.session_state.saved_pairs[pair_name] = {
-            "a": {
-                "name": practitioner_a.name,
-                "belt": practitioner_a.bjj_belt_rank,
-                "age": practitioner_a.age_years,
-                "weight": practitioner_a.weight_lbs,
-                "fitness": practitioner_a.standardized_fitness_test_percentile_estimate,
-                "sessions": practitioner_a.bjj_training_sessions_per_week,
-                "competition": practitioner_a.bjj_competition_experience_level
-            },
-            "b": {
-                "name": practitioner_b.name,
-                "belt": practitioner_b.bjj_belt_rank,
-                "age": practitioner_b.age_years,
-                "weight": practitioner_b.weight_lbs,
-                "fitness": practitioner_b.standardized_fitness_test_percentile_estimate,
-                "sessions": practitioner_b.bjj_training_sessions_per_week,
-                "competition": practitioner_b.bjj_competition_experience_level
-            }
+    # Save practitioner A if requested
+    if save_a and save_name_a:
+        # Check if there's already a practitioner with this name
+        if save_name_a in st.session_state.saved_practitioners:
+            st.warning(f"A practitioner named '{save_name_a}' already exists. Overwriting...")
+            
+        # Create a practitioner record
+        st.session_state.saved_practitioners[save_name_a] = {
+            "name": practitioner_a.name,
+            "belt": practitioner_a.bjj_belt_rank,
+            "age": practitioner_a.age_years,
+            "weight": practitioner_a.weight_lbs,
+            "fitness": practitioner_a.standardized_fitness_test_percentile_estimate,
+            "sessions": practitioner_a.bjj_training_sessions_per_week,
+            "competition": practitioner_a.bjj_competition_experience_level
         }
-        st.success(f"Pair '{pair_name}' saved!")
+        
+        # Add grappling experience if present
+        if practitioner_a.other_grappling_art_experience:
+            art_experience = practitioner_a.other_grappling_art_experience[0]
+            st.session_state.saved_practitioners[save_name_a]["art"] = art_experience["art_name"]
+            st.session_state.saved_practitioners[save_name_a]["exp_level"] = art_experience["experience_level_descriptor"]
+        else:
+            st.session_state.saved_practitioners[save_name_a]["art"] = "None"
+            
+        # Save to disk for persistence across sessions
+        save_practitioners_to_disk()
+        
+        st.success(f"Practitioner '{save_name_a}' saved!")
+        
+    # Save practitioner B if requested
+    if save_b and save_name_b:
+        # Check if there's already a practitioner with this name
+        if save_name_b in st.session_state.saved_practitioners:
+            st.warning(f"A practitioner named '{save_name_b}' already exists. Overwriting...")
+            
+        # Create a practitioner record
+        st.session_state.saved_practitioners[save_name_b] = {
+            "name": practitioner_b.name,
+            "belt": practitioner_b.bjj_belt_rank,
+            "age": practitioner_b.age_years,
+            "weight": practitioner_b.weight_lbs,
+            "fitness": practitioner_b.standardized_fitness_test_percentile_estimate,
+            "sessions": practitioner_b.bjj_training_sessions_per_week,
+            "competition": practitioner_b.bjj_competition_experience_level
+        }
+        
+        # Add grappling experience if present
+        if practitioner_b.other_grappling_art_experience:
+            art_experience = practitioner_b.other_grappling_art_experience[0]
+            st.session_state.saved_practitioners[save_name_b]["art"] = art_experience["art_name"]
+            st.session_state.saved_practitioners[save_name_b]["exp_level"] = art_experience["experience_level_descriptor"]
+        else:
+            st.session_state.saved_practitioners[save_name_b]["art"] = "None"
+            
+        # Save to disk for persistence across sessions
+        save_practitioners_to_disk()
+        
+        st.success(f"Practitioner '{save_name_b}' saved!")
     
     if compare_button:
         # Calculate factors and HS for both
@@ -370,11 +522,11 @@ def about_view():
     3. The large score display at the top of each practitioner updates in real-time
     4. Click "Compare Practitioners" for detailed radar charts and matchup profiles
     
-    #### Managing Practitioner Pairs
-    1. Enter a name in the "Pair Name" field 
-    2. Click "Save Current" to store the current practitioner pair
-    3. Use the dropdown to select previously saved pairs
-    4. Click "Load Selected Pair" to retrieve saved practitioners
+    #### Managing Practitioners
+    1. Save practitioners individually with custom names
+    2. Load any saved practitioner into either position A or B
+    3. Mix and match different saved practitioners for comparison
+    4. Delete practitioners you no longer need
     
     #### Understanding the Factors
     - **Belt Rank Score (BRS)**: Your base score determined by belt rank
