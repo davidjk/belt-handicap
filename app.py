@@ -9,6 +9,55 @@ from ui.input_forms import render_practitioner_form
 from ui.visualizations import render_factor_visualization, render_comparison_visualization
 from ui.profile_display import render_profile, render_profile_comparison
 
+# Setup for persistent storage of saved practitioners
+practitioners_path = os.path.join(os.path.dirname(__file__), "data", "saved_practitioners.json")
+
+# Function to save practitioners to disk
+def save_practitioners_to_disk():
+    try:
+        # Ensure data directory exists
+        data_dir = os.path.join(os.path.dirname(__file__), "data")
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            
+        # Convert dict keys to strings to ensure JSON serialization works
+        serializable_practitioners = {}
+        for key, value in st.session_state.saved_practitioners.items():
+            serializable_practitioners[str(key)] = value
+            
+        with open(practitioners_path, 'w') as f:
+            json.dump(serializable_practitioners, f, indent=2)
+    except Exception as e:
+        st.error(f"Error saving practitioners: {e}")
+
+# Function to load practitioners from disk
+def load_practitioners_from_disk():
+    try:
+        if os.path.exists(practitioners_path):
+            with open(practitioners_path, 'r') as f:
+                loaded_practitioners = json.load(f)
+                # Log successful load
+                print(f"Successfully loaded {len(loaded_practitioners)} saved practitioners")
+                return loaded_practitioners
+        else:
+            print("No saved practitioners file found, starting with empty practitioners")
+        return {}
+    except json.JSONDecodeError as e:
+        print(f"Error decoding saved practitioners JSON: {e}")
+        # If the file is corrupted, create a backup
+        if os.path.exists(practitioners_path):
+            backup_path = practitioners_path + ".backup"
+            try:
+                import shutil
+                shutil.copy2(practitioners_path, backup_path)
+                print(f"Created backup of corrupted practitioners file at {backup_path}")
+            except Exception as backup_error:
+                print(f"Failed to create backup: {backup_error}")
+        return {}
+    except Exception as e:
+        print(f"Error loading saved practitioners: {e}")
+        return {}
+
 def main():
     """
     Main Streamlit application entry point.
@@ -88,55 +137,6 @@ def main():
         except (FileNotFoundError, ValueError) as e:
             st.error(f"Error loading configuration: {e}")
             return
-            
-    # Setup for persistent storage of saved practitioners
-    practitioners_path = os.path.join(os.path.dirname(__file__), "data", "saved_practitioners.json")
-    
-    # Function to save practitioners to disk
-    def save_practitioners_to_disk():
-        try:
-            # Ensure data directory exists
-            data_dir = os.path.join(os.path.dirname(__file__), "data")
-            if not os.path.exists(data_dir):
-                os.makedirs(data_dir)
-                
-            # Convert dict keys to strings to ensure JSON serialization works
-            serializable_practitioners = {}
-            for key, value in st.session_state.saved_practitioners.items():
-                serializable_practitioners[str(key)] = value
-                
-            with open(practitioners_path, 'w') as f:
-                json.dump(serializable_practitioners, f, indent=2)
-        except Exception as e:
-            st.error(f"Error saving practitioners: {e}")
-    
-    # Function to load practitioners from disk
-    def load_practitioners_from_disk():
-        try:
-            if os.path.exists(practitioners_path):
-                with open(practitioners_path, 'r') as f:
-                    loaded_practitioners = json.load(f)
-                    # Log successful load
-                    print(f"Successfully loaded {len(loaded_practitioners)} saved practitioners")
-                    return loaded_practitioners
-            else:
-                print("No saved practitioners file found, starting with empty practitioners")
-            return {}
-        except json.JSONDecodeError as e:
-            print(f"Error decoding saved practitioners JSON: {e}")
-            # If the file is corrupted, create a backup
-            if os.path.exists(practitioners_path):
-                backup_path = practitioners_path + ".backup"
-                try:
-                    import shutil
-                    shutil.copy2(practitioners_path, backup_path)
-                    print(f"Created backup of corrupted practitioners file at {backup_path}")
-                except Exception as backup_error:
-                    print(f"Failed to create backup: {backup_error}")
-            return {}
-        except Exception as e:
-            print(f"Error loading saved practitioners: {e}")
-            return {}
     
     # Create core system components
     calculator = Calculator(st.session_state.config)
