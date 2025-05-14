@@ -4,13 +4,15 @@ import uuid
 from jar.types import PractitionerData, BeltRank, ActivityLevel, CompetitionLevel
 from jar.config import JARConfig
 
-def render_practitioner_form(key_prefix: str, config: JARConfig) -> PractitionerData:
+def render_practitioner_form(key_prefix: str, config: JARConfig, score_factors=None, on_change=None) -> PractitionerData:
     """
     Render form for practitioner data input with appropriate controls.
     
     Args:
         key_prefix: Prefix for unique Streamlit widget keys
         config: JAR system configuration
+        score_factors: Optional FactorResults to display impact percentages
+        on_change: Optional callback to trigger when input values change
         
     Returns:
         Populated PractitionerData object
@@ -46,83 +48,111 @@ def render_practitioner_form(key_prefix: str, config: JARConfig) -> Practitioner
         "BJJ Belt Rank", 
         options=belt_options,
         index=belt_options.index(st.session_state[f"{key_prefix}_belt"]) if st.session_state[f"{key_prefix}_belt"] in belt_options else 0,
-        key=f"{key_prefix}_belt"
+        key=f"{key_prefix}_belt",
+        on_change=on_change if on_change else None
     )
     
-    # Create uniform slider layout section
-    st.markdown("""<div class="form-row">""", unsafe_allow_html=True)
+    # Show base score for belt rank
+    if score_factors:
+        st.markdown(f"""
+        <div style="background-color: rgba(79, 146, 211, 0.15); padding: 8px; border-radius: 6px; 
+                    margin-top: 2px; margin-bottom: 15px; border: 1px solid #495057;">
+            <p style="margin: 0; text-align: center; font-weight: bold; font-size: 0.9em; color: #4f92d3;">
+                Base BRS: {score_factors.brs:.0f} points
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Age and Weight sliders in the first row with consistent heights
-    col1, col2 = st.columns(2)
+    # Define helper function to display impact percentage
+    def show_impact(factor_value, label):
+        if score_factors is not None:
+            # Calculate percentage impact
+            impact = (factor_value - 1.0) * 100
+            color = "#4db380" if impact >= 0 else "#e05a45"
+            sign = "+" if impact > 0 else ""
+            st.markdown(f"""
+            <div style="background-color: rgba(79, 146, 211, 0.15); padding: 8px; border-radius: 6px; 
+                        margin-top: 2px; margin-bottom: 15px; border: 1px solid #495057;">
+                <p style="margin: 0; text-align: center; font-weight: bold; font-size: 0.9em; color: {color};">
+                    {label} Impact: {sign}{impact:.1f}%
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
     
-    with col1:
-        st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
-        age_years = st.slider(
-            "Age (years)", 
-            min_value=16, 
-            max_value=70, 
-            value=st.session_state[f"{key_prefix}_age"],
-            key=f"{key_prefix}_age"
-        )
-        st.markdown("""</div>""", unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
-        weight_lbs = st.slider(
-            "Weight (lbs)", 
-            min_value=100, 
-            max_value=350, 
-            value=st.session_state[f"{key_prefix}_weight"],
-            step=5,
-            key=f"{key_prefix}_weight"
-        )
-        st.markdown("""</div>""", unsafe_allow_html=True)
-    
-    # Fitness level and training frequency in the second row with consistent heights
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Fitness assessment with qualitative slider
-        fitness_options = [
-            "Below Average (<30th percentile)",
-            "Average (30th-60th percentile)",
-            "Above Average (61st-80th percentile)",
-            "Notably Athletic (81st-95th percentile)",
-            "Exceptional Athlete (>95th percentile)"
-        ]
-        
-        fitness_level_index = fitness_options.index(st.session_state[f"{key_prefix}_fitness_level"]) if st.session_state[f"{key_prefix}_fitness_level"] in fitness_options else 1
-        
-        st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
-        fitness_level_numeric = st.slider(
-            "Fitness Level",
-            min_value=1,
-            max_value=5,
-            value=fitness_level_index + 1,
-            key=f"{key_prefix}_fitness_numeric"
-        )
-        
-        # Convert numeric value to the text option
-        fitness_level = fitness_options[fitness_level_numeric - 1]
-        st.session_state[f"{key_prefix}_fitness_level"] = fitness_level
-        
-        # Small label to show the selected fitness level
-        st.caption(fitness_level)
-        st.markdown("""</div>""", unsafe_allow_html=True)
-    
-    with col2:
-        # Training frequency with slider
-        st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
-        bjj_training_sessions_per_week = st.slider(
-            "BJJ Training Sessions per Week",
-            min_value=0,
-            max_value=10,
-            value=st.session_state[f"{key_prefix}_sessions"],
-            key=f"{key_prefix}_sessions"
-        )
-        st.markdown("""</div>""", unsafe_allow_html=True)
-    
+    # Create vertical layout for inputs with impact values
+    # Age input with impact
+    st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
+    age_years = st.slider(
+        "Age (years)", 
+        min_value=16, 
+        max_value=70, 
+        value=st.session_state[f"{key_prefix}_age"],
+        key=f"{key_prefix}_age",
+        on_change=on_change if on_change else None
+    )
     st.markdown("""</div>""", unsafe_allow_html=True)
+    if score_factors:
+        show_impact(score_factors.af, "Age")
+        
+    # Weight input with impact
+    st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
+    weight_lbs = st.slider(
+        "Weight (lbs)", 
+        min_value=100, 
+        max_value=350, 
+        value=st.session_state[f"{key_prefix}_weight"],
+        step=5,
+        key=f"{key_prefix}_weight",
+        on_change=on_change if on_change else None
+    )
+    st.markdown("""</div>""", unsafe_allow_html=True)
+    if score_factors:
+        show_impact(score_factors.wf, "Weight")
+    
+    # Fitness level with impact
+    fitness_options = [
+        "Below Average (<30th percentile)",
+        "Average (30th-60th percentile)",
+        "Above Average (61st-80th percentile)",
+        "Notably Athletic (81st-95th percentile)",
+        "Exceptional Athlete (>95th percentile)"
+    ]
+    
+    fitness_level_index = fitness_options.index(st.session_state[f"{key_prefix}_fitness_level"]) if st.session_state[f"{key_prefix}_fitness_level"] in fitness_options else 1
+    
+    st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
+    fitness_level_numeric = st.slider(
+        "Fitness Level",
+        min_value=1,
+        max_value=5,
+        value=fitness_level_index + 1,
+        key=f"{key_prefix}_fitness_numeric",
+        on_change=on_change if on_change else None
+    )
+    
+    # Convert numeric value to the text option
+    fitness_level = fitness_options[fitness_level_numeric - 1]
+    st.session_state[f"{key_prefix}_fitness_level"] = fitness_level
+    
+    # Small label to show the selected fitness level
+    st.caption(fitness_level)
+    st.markdown("""</div>""", unsafe_allow_html=True)
+    if score_factors:
+        show_impact(score_factors.acf, "Fitness")
+        
+    # Training frequency with impact
+    st.markdown("""<div class="slider-container">""", unsafe_allow_html=True)
+    bjj_training_sessions_per_week = st.slider(
+        "BJJ Training Sessions per Week",
+        min_value=0,
+        max_value=10,
+        value=st.session_state[f"{key_prefix}_sessions"],
+        key=f"{key_prefix}_sessions",
+        on_change=on_change if on_change else None
+    )
+    st.markdown("""</div>""", unsafe_allow_html=True)
+    if score_factors:
+        show_impact(score_factors.tff, "Training Frequency")
     
     # Map qualitative fitness levels to percentile ranges for internal calculations
     fitness_level_mapping = {
@@ -145,8 +175,13 @@ def render_practitioner_form(key_prefix: str, config: JARConfig) -> Practitioner
         "BJJ Competition Experience",
         options=competition_options,
         index=competition_options.index(st.session_state[f"{key_prefix}_comp"]) if st.session_state[f"{key_prefix}_comp"] in competition_options else 0,
-        key=f"{key_prefix}_comp"
+        key=f"{key_prefix}_comp",
+        on_change=on_change if on_change else None
     )
+    
+    # Show competition experience impact
+    if score_factors:
+        show_impact(score_factors.cef, "Competition Experience")
     
     # Grappling experience with consistent dark theme styling
     st.markdown(f"""
@@ -163,8 +198,13 @@ def render_practitioner_form(key_prefix: str, config: JARConfig) -> Practitioner
         "Grappling Art",
         options=art_options,
         index=art_options.index(st.session_state[f"{key_prefix}_art"]) if st.session_state[f"{key_prefix}_art"] in art_options else 0,
-        key=f"{key_prefix}_art"
+        key=f"{key_prefix}_art",
+        on_change=on_change if on_change else None
     )
+    
+    # Show grappling experience impact
+    if score_factors and selected_art != "None":
+        show_impact(score_factors.ref, "Grappling Experience")
     
     # Process grappling experience
     grappling_experience = []
@@ -200,7 +240,8 @@ def render_practitioner_form(key_prefix: str, config: JARConfig) -> Practitioner
                 "Experience Level",
                 options=experience_options,
                 index=experience_options.index(st.session_state[f"{key_prefix}_exp_level"]) if st.session_state[f"{key_prefix}_exp_level"] in experience_options else 0,
-                key=f"{key_prefix}_exp_level"
+                key=f"{key_prefix}_exp_level",
+                on_change=on_change if on_change else None
             )
         
         with col2:

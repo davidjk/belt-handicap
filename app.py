@@ -172,13 +172,121 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
     # Create two columns for practitioner inputs
     col1, col2 = st.columns(2)
     
+    # Initialize placeholder scores in session state
+    if "score_a" not in st.session_state:
+        st.session_state.score_a = 0
+    if "score_b" not in st.session_state:
+        st.session_state.score_b = 0
+    if "factors_a" not in st.session_state:
+        st.session_state.factors_a = None
+    if "factors_b" not in st.session_state:
+        st.session_state.factors_b = None
+        
+    # Define the fitness level mapping for score calculation
+    fitness_level_mapping = {
+        "Below Average (<30th percentile)": 25,
+        "Average (30th-60th percentile)": 50,
+        "Above Average (61st-80th percentile)": 70,
+        "Notably Athletic (81st-95th percentile)": 88,
+        "Exceptional Athlete (>95th percentile)": 97
+    }
+    
+    # Function to calculate and display scores reactively
+    def update_scores():
+        try:
+            # Create a new calculator
+            calculator = Calculator(st.session_state.config)
+            
+            # Create practitioner objects based on current session state
+            practitioner_a = PractitionerData(
+                name=st.session_state.practitioner_a_name if "practitioner_a_name" in st.session_state else "",
+                bjj_belt_rank=st.session_state.practitioner_a_belt if "practitioner_a_belt" in st.session_state else "White",
+                age_years=st.session_state.practitioner_a_age if "practitioner_a_age" in st.session_state else 30,
+                weight_lbs=float(st.session_state.practitioner_a_weight) if "practitioner_a_weight" in st.session_state else 170.0,
+                primary_occupation_activity_level="Moderately Active",
+                standardized_fitness_test_percentile_estimate=(
+                    fitness_level_mapping[st.session_state.practitioner_a_fitness_level] 
+                    if "practitioner_a_fitness_level" in st.session_state else 50
+                ),
+                other_grappling_art_experience=(
+                    [{"art_name": st.session_state.practitioner_a_art, 
+                      "experience_level_descriptor": st.session_state.practitioner_a_exp_level}] 
+                    if "practitioner_a_art" in st.session_state and st.session_state.practitioner_a_art != "None" 
+                    else []
+                ),
+                bjj_training_sessions_per_week=st.session_state.practitioner_a_sessions if "practitioner_a_sessions" in st.session_state else 3,
+                bjj_competition_experience_level=st.session_state.practitioner_a_comp if "practitioner_a_comp" in st.session_state else "None",
+                practitioner_id="a"
+            )
+            
+            practitioner_b = PractitionerData(
+                name=st.session_state.practitioner_b_name if "practitioner_b_name" in st.session_state else "",
+                bjj_belt_rank=st.session_state.practitioner_b_belt if "practitioner_b_belt" in st.session_state else "White",
+                age_years=st.session_state.practitioner_b_age if "practitioner_b_age" in st.session_state else 30,
+                weight_lbs=float(st.session_state.practitioner_b_weight) if "practitioner_b_weight" in st.session_state else 170.0,
+                primary_occupation_activity_level="Moderately Active",
+                standardized_fitness_test_percentile_estimate=(
+                    fitness_level_mapping[st.session_state.practitioner_b_fitness_level] 
+                    if "practitioner_b_fitness_level" in st.session_state else 50
+                ),
+                other_grappling_art_experience=(
+                    [{"art_name": st.session_state.practitioner_b_art, 
+                      "experience_level_descriptor": st.session_state.practitioner_b_exp_level}] 
+                    if "practitioner_b_art" in st.session_state and st.session_state.practitioner_b_art != "None" 
+                    else []
+                ),
+                bjj_training_sessions_per_week=st.session_state.practitioner_b_sessions if "practitioner_b_sessions" in st.session_state else 3,
+                bjj_competition_experience_level=st.session_state.practitioner_b_comp if "practitioner_b_comp" in st.session_state else "None",
+                practitioner_id="b"
+            )
+            
+            # Calculate factors and scores
+            factors_a = calculator.calculate_all_factors(practitioner_a, practitioner_b)
+            hs_a = factors_a.calculate_handicapped_score()
+            
+            factors_b = calculator.calculate_all_factors(practitioner_b, practitioner_a)
+            hs_b = factors_b.calculate_handicapped_score()
+            
+            # Store in session state
+            st.session_state.score_a = hs_a
+            st.session_state.score_b = hs_b
+            st.session_state.factors_a = factors_a
+            st.session_state.factors_b = factors_b
+            
+            st.experimental_rerun()
+        except Exception as e:
+            print(f"Error updating scores: {e}")
+            pass
+    
+    # Calculate initial scores if they haven't been calculated yet
+    if st.session_state.score_a == 0 and st.session_state.score_b == 0:
+        update_scores()
+    
     with col1:
+        # Display score centered above the practitioner container
+        st.markdown(
+            f'<div style="text-align: center; margin-bottom: 20px;">'
+            f'<h2 style="font-size: 3.5rem; margin: 0; color: #4f92d3;">Score: {st.session_state.score_a:.1f}</h2>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
         st.markdown('<div class="practitioner-heading">Practitioner A</div>', unsafe_allow_html=True)
-        practitioner_a = render_practitioner_form("practitioner_a", st.session_state.config)
+        practitioner_a = render_practitioner_form("practitioner_a", st.session_state.config, 
+                                                 score_factors=st.session_state.factors_a,
+                                                 on_change=update_scores)
     
     with col2:
+        # Display score centered above the practitioner container
+        st.markdown(
+            f'<div style="text-align: center; margin-bottom: 20px;">'
+            f'<h2 style="font-size: 3.5rem; margin: 0; color: #4f92d3;">Score: {st.session_state.score_b:.1f}</h2>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
         st.markdown('<div class="practitioner-heading">Practitioner B</div>', unsafe_allow_html=True)
-        practitioner_b = render_practitioner_form("practitioner_b", st.session_state.config)
+        practitioner_b = render_practitioner_form("practitioner_b", st.session_state.config, 
+                                                 score_factors=st.session_state.factors_b,
+                                                 on_change=update_scores)
     
     compare_button = st.button("Compare Practitioners")
     
@@ -252,8 +360,6 @@ def about_view():
     potential performance based on a broader set of factors.
     """)
     
-    st.image("https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80", 
-             caption="Brazilian Jiu-Jitsu training", use_container_width=True)
     
     st.markdown("""
     ### How to Use This App:
