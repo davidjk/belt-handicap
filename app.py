@@ -20,201 +20,263 @@ def main():
         initial_sidebar_state="expanded",
     )
     
-    # Add global CSS for consistent, modern styling with dark theme
-    st.markdown("""
-    <style>
-    /* Modern, harmonious color palette optimized for dark theme */
-    :root {
-        --primary-color: #4f92d3;
-        --primary-light: rgba(79, 146, 211, 0.15);
-        --accent-positive: #4db380;
-        --accent-positive-light: rgba(77, 179, 128, 0.15);
-        --accent-negative: #e05a45;
-        --accent-negative-light: rgba(224, 90, 69, 0.15);
-        --accent-neutral: #d8b24b;
-        --accent-neutral-light: rgba(216, 178, 75, 0.15);
-        --text-bright: #e9ecef;
-        --text-medium: #adb5bd;
-        --text-dim: #6c757d;
-        --border-color: #495057;
-        --background-main: #1a1a1a;
-        --background-card: #222222;
-        --background-elevated: #2a2a2a;
-        --background-highlight: #333333;
-    }
+    # Add the dark theme configuration to session state for persistence
+    if "css_injected" not in st.session_state:
+        st.session_state.css_injected = True
     
-    /* Global styles for dark theme */
-    .stApp {
-        background-color: var(--background-main) !important;
-        color: var(--text-bright) !important;
-    }
-    
-    /* All form inputs and containers match the dark theme */
-    .stTextInput input, 
-    .stNumberInput input, 
-    .stSelectbox > div,
-    .stSlider > div,
-    .stTextArea textarea,
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="base-input"] {
-        background-color: var(--background-elevated) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 6px !important;
-        color: var(--text-bright) !important;
-    }
-    
-    /* Make select dropdown styling nicer in dark theme */
-    div[data-baseweb="select"] > div {
-        background-color: var(--background-elevated) !important;
-        color: var(--text-bright) !important;
-        border-color: var(--border-color) !important;
-    }
-    
-    div[data-baseweb="popover"] div {
-        background-color: var(--background-elevated) !important;
-        color: var(--text-bright) !important;
-    }
-    
-    div[data-testid="stMarkdownContainer"] > div {
-        background-color: transparent !important;
-    }
-    
-    /* Consistent form heading styles */
-    h1, h2, h3, .css-10trblm, .css-zt5igj {
-        color: var(--primary-color) !important;
-        font-weight: 500 !important;
-    }
-    
-    h4, h5, h6 {
-        color: var(--text-bright) !important;
-        font-weight: 500 !important;
-    }
-    
-    /* Override the stSubheader styling for dark theme */
-    div[data-testid="stSubheader"] {
-        color: var(--text-medium) !important;
-        font-weight: 500 !important;
-        font-size: 1.1rem !important;
-        padding-top: 0.5rem !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    /* Better styled tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 24px !important;
-        border-bottom: 1px solid var(--border-color) !important;
-        background-color: var(--background-main) !important;
-    }
-    
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        color: var(--text-medium) !important;
-    }
-    
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] [data-testid="stMarkdownContainer"] p {
-        color: var(--primary-color) !important;
-    }
-    
-    /* Better buttons */
-    .stButton > button {
-        background-color: var(--primary-color) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 6px !important;
-        padding: 0.6rem 1.7rem !important;
-        font-weight: 500 !important;
-        transition: all 0.2s !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
-    }
-    
-    .stButton > button:hover {
-        background-color: #3d77b0 !important;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
-    }
-    
-    /* Make slider thumbs visible in dark theme */
-    .stSlider [data-baseweb="slider"] div[role="slider"] {
-        background-color: var(--primary-color) !important;
-        border-color: var(--primary-color) !important;
-    }
-    
-    /* Make slider rails match theme */
-    .stSlider [data-baseweb="slider"] div {
-        background-color: var(--border-color) !important;
-    }
-    
-    .stSlider [data-baseweb="slider"] div[role="progressbar"] {
-        background-color: var(--primary-color) !important;
-    }
-    
-    /* Add light separator borders around interface sections */
-    .interface-section {
-        border-bottom: 1px solid var(--border-color) !important;
-        padding-bottom: 1.5rem !important;
-        margin-bottom: 1.5rem !important;
-    }
-    
-    /* Custom header format for section titles in dark theme */
-    .section-title {
-        font-size: 1.8em !important;
-        font-weight: 500 !important;
-        margin: 1.5rem 0 1rem 0 !important;
-        padding-bottom: 0.5rem !important;
-        border-bottom: 1px solid var(--border-color) !important;
-        color: var(--primary-color) !important;
-    }
-    
-    /* Practitioner heading styles */
-    .practitioner-heading {
-        color: var(--text-medium) !important;
-        font-size: 1.2rem !important;
-        font-weight: 400 !important;
-        letter-spacing: 0.5px !important;
-        border-bottom: none !important;
-        padding-bottom: 0.5rem !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    /* Fix for information boxes */
-    .info-box {
-        background-color: var(--background-elevated) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-medium) !important;
-        padding: 12px !important;
-        border-radius: 6px !important;
-        margin: 10px 0 !important;
-    }
-    
-    /* Make expanders match theme */
-    .streamlit-expanderHeader {
-        background-color: var(--background-elevated) !important;
-        color: var(--text-medium) !important;
-    }
-    
-    .streamlit-expanderContent {
-        background-color: var(--background-card) !important;
-        border-top: 1px solid var(--border-color) !important;
-        color: var(--text-bright) !important;
-    }
-    
-    /* Add consistent form field height and spacing */
-    .form-field-container {
-        margin-bottom: 1.2rem !important;
-    }
-    
-    /* Create wrapper for same-height sliders */
-    .slider-container {
-        display: flex;
-        flex-direction: column;
-        height: 80px;
-    }
-    
-    /* Fix any white text on white background issues */
-    div.stMarkdown, div.stText {
-        color: var(--text-bright) !important;
-        background-color: transparent !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+        # Set dark theme CSS
+        st.markdown("""
+        <style>
+        /* Modern, harmonious color palette optimized for dark theme */
+        html {
+            --primary-color: #4f92d3;
+            --primary-light: rgba(79, 146, 211, 0.15);
+            --accent-positive: #4db380;
+            --accent-positive-light: rgba(77, 179, 128, 0.15);
+            --accent-negative: #e05a45;
+            --accent-negative-light: rgba(224, 90, 69, 0.15);
+            --accent-neutral: #d8b24b;
+            --accent-neutral-light: rgba(216, 178, 75, 0.15);
+            --text-bright: #e9ecef;
+            --text-medium: #adb5bd;
+            --text-dim: #6c757d;
+            --border-color: #495057;
+            --background-main: #1a1a1a;
+            --background-card: #222222;
+            --background-elevated: #2a2a2a;
+            --background-highlight: #333333;
+        }
+        
+        /* Force dark theme on all elements */
+        body {
+            background-color: #1a1a1a !important;
+            color: #e9ecef !important;
+        }
+        
+        /* Global styles for dark theme */
+        .main, .stApp, .css-18e3th9, .css-1d391kg, [data-testid="stAppViewContainer"], 
+        [data-testid="stAppViewContainer"] .main {
+            background-color: #1a1a1a !important;
+            color: #e9ecef !important;
+        }
+        
+        /* Forcefully override light theme and make all content containers dark */
+        div.stBlock, div.row-widget, div.block-container, div.element-container, div.stTabs,
+        div[data-testid="stDecoration"], div[data-testid="stToolbar"], div[data-testid="baseButton-secondary"],
+        div.stToolbar, div[data-testid="stHeader"], [data-testid="stHeader"],
+        div[data-testid="stVerticalBlock"], div[data-testid="stHorizontalBlock"] {
+            background-color: #1a1a1a !important;
+            border-color: #495057 !important;
+            color: #e9ecef !important;
+        }
+        
+        /* All form inputs and containers match the dark theme */
+        .stTextInput input, 
+        .stNumberInput input, 
+        .stSelectbox > div,
+        .stSlider > div,
+        .stTextArea textarea,
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="base-input"],
+        [data-baseweb="input"] input {
+            background-color: #2a2a2a !important;
+            border: 1px solid #495057 !important;
+            border-radius: 6px !important;
+            color: #e9ecef !important;
+        }
+        
+        /* Make select dropdown styling nicer in dark theme */
+        div[data-baseweb="select"] > div,
+        div[role="listbox"],
+        div[data-baseweb="menu"],
+        div[data-baseweb="popover"],
+        div[role="option"] {
+            background-color: #2a2a2a !important;
+            color: #e9ecef !important;
+            border-color: #495057 !important;
+        }
+        
+        div[data-baseweb="popover"] div {
+            background-color: #2a2a2a !important;
+            color: #e9ecef !important;
+        }
+        
+        div[data-testid="stMarkdownContainer"] > div {
+            background-color: transparent !important;
+        }
+        
+        /* Consistent form heading styles */
+        h1, h2, h3, .css-10trblm, .css-zt5igj {
+            color: #4f92d3 !important;
+            font-weight: 500 !important;
+        }
+        
+        h4, h5, h6 {
+            color: #e9ecef !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Override the stSubheader styling for dark theme */
+        div[data-testid="stSubheader"] {
+            color: #adb5bd !important;
+            font-weight: 500 !important;
+            font-size: 1.1rem !important;
+            padding-top: 0.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        /* Better styled tabs */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 24px !important;
+            border-bottom: 1px solid #495057 !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+            color: #adb5bd !important;
+        }
+        
+        .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] [data-testid="stMarkdownContainer"] p {
+            color: #4f92d3 !important;
+        }
+        
+        /* Better buttons */
+        .stButton > button {
+            background-color: #4f92d3 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            padding: 0.6rem 1.7rem !important;
+            font-weight: 500 !important;
+            transition: all 0.2s !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+        }
+        
+        .stButton > button:hover {
+            background-color: #3d77b0 !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+        }
+        
+        /* Make slider thumbs visible in dark theme */
+        .stSlider [data-baseweb="slider"] div[role="slider"] {
+            background-color: #4f92d3 !important;
+            border-color: #4f92d3 !important;
+        }
+        
+        /* Make slider rails match theme */
+        .stSlider [data-baseweb="slider"] div {
+            background-color: #495057 !important;
+        }
+        
+        .stSlider [data-baseweb="slider"] div[role="progressbar"] {
+            background-color: #4f92d3 !important;
+        }
+        
+        /* Add light separator borders around interface sections */
+        .interface-section {
+            border-bottom: 1px solid #495057 !important;
+            padding-bottom: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        
+        /* Custom header format for section titles in dark theme */
+        .section-title {
+            font-size: 1.8em !important;
+            font-weight: 500 !important;
+            margin: 1.5rem 0 1rem 0 !important;
+            padding-bottom: 0.5rem !important;
+            border-bottom: 1px solid #495057 !important;
+            color: #4f92d3 !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Practitioner heading styles */
+        .practitioner-heading {
+            color: #adb5bd !important;
+            font-size: 1.2rem !important;
+            font-weight: 400 !important;
+            letter-spacing: 0.5px !important;
+            border-bottom: none !important;
+            padding-bottom: 0.5rem !important;
+            margin-bottom: 1rem !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Fix for information boxes */
+        .info-box {
+            background-color: #2a2a2a !important;
+            border: 1px solid #495057 !important;
+            color: #adb5bd !important;
+            padding: 12px !important;
+            border-radius: 6px !important;
+            margin: 10px 0 !important;
+        }
+        
+        /* Make expanders match theme */
+        .streamlit-expanderHeader {
+            background-color: #2a2a2a !important;
+            color: #adb5bd !important;
+        }
+        
+        .streamlit-expanderContent {
+            background-color: #222222 !important;
+            border-top: 1px solid #495057 !important;
+            color: #e9ecef !important;
+        }
+        
+        /* Add consistent form field height and spacing */
+        .form-field-container {
+            margin-bottom: 1.2rem !important;
+        }
+        
+        /* Create wrapper for same-height sliders */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            height: 80px;
+        }
+        
+        /* Fix any white text on white background issues */
+        div.stMarkdown, div.stText, p, span, div {
+            color: #e9ecef !important;
+            background-color: transparent !important;
+        }
+        
+        /* Fix matplotlib outputs */
+        .stMarkdown img, [data-testid="stImage"] img {
+            background-color: #222222 !important;
+        }
+        
+        /* Fix dataframes */
+        .dataframe {
+            color: #e9ecef !important;
+        }
+        
+        .dataframe tbody tr {
+            background-color: #222222 !important;
+        }
+        
+        .dataframe tbody tr:nth-child(odd) {
+            background-color: #2a2a2a !important;
+        }
+        
+        .dataframe thead tr {
+            background-color: #333333 !important;
+        }
+        
+        /* Fix metric */
+        [data-testid="stMetricValue"] {
+            background-color: transparent !important;
+            color: #4f92d3 !important;
+            font-weight: bold !important;
+        }
+        
+        /* Force our dark theme on all elements, including ones added later */
+        *, *:before, *:after {
+            color-scheme: dark !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
     
     st.title("Jiu-Jitsu Attribute Rating (JAR) System")
     

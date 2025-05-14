@@ -11,47 +11,30 @@ def render_profile(profile: RollDynamicsProfile) -> None:
     """
     st.markdown("""
     <style>
-    /* Modern, harmonious color palette */
-    :root {
-        --primary-color: #336699;
-        --primary-light: #f0f7ff;
-        --accent-positive: #2d8659;
-        --accent-positive-light: #eaf7f0;
-        --accent-negative: #994436;
-        --accent-negative-light: #fdf0ee;
-        --accent-neutral: #997a36;
-        --accent-neutral-light: #fdf8e6;
-        --text-dark: #343a40;
-        --text-medium: #495057;
-        --text-light: #6c757d;
-        --border-color: #dee2e6;
-        --background-main: #ffffff;
-        --background-light: #f8f9fa;
-    }
-    
+    /* Profile container styling for dark theme */
     .profile-container {
-        border: 1px solid var(--border-color);
+        border: 1px solid #495057;
         border-radius: 12px;
         padding: 25px;
         margin-bottom: 30px;
-        background-color: var(--background-main);
-        color: var(--text-dark);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        background-color: #222222;
+        color: #e9ecef;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     
     .profile-header {
         font-size: 1.8em;
         font-weight: 600;
         margin-bottom: 18px;
-        color: var(--primary-color);
+        color: #4f92d3;
         padding-bottom: 10px;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid #495057;
     }
     
     .profile-data {
         font-size: 1.2em;
         margin-bottom: 12px;
-        color: var(--text-medium);
+        color: #adb5bd;
         display: flex;
         align-items: center;
     }
@@ -59,7 +42,7 @@ def render_profile(profile: RollDynamicsProfile) -> None:
     .profile-data strong {
         min-width: 180px;
         display: inline-block;
-        color: var(--text-dark);
+        color: #e9ecef;
     }
     
     .profile-section-header {
@@ -67,32 +50,32 @@ def render_profile(profile: RollDynamicsProfile) -> None:
         font-weight: 600;
         margin-top: 20px;
         margin-bottom: 12px;
-        color: var(--primary-color);
+        color: #4f92d3;
         background: transparent;
         padding-top: 10px;
-        border-top: 1px solid var(--border-color);
+        border-top: 1px solid #495057;
     }
     
     .strength-item {
         font-size: 1.15em;
         margin-bottom: 10px;
         font-weight: 400;
-        color: var(--text-dark);
-        background-color: var(--accent-positive-light);
+        color: #e9ecef;
+        background-color: rgba(77, 179, 128, 0.15);
         padding: 10px 15px;
         border-radius: 6px;
-        border-left: 4px solid var(--accent-positive);
+        border-left: 4px solid #4db380;
     }
     
     .challenge-item {
         font-size: 1.15em;
         margin-bottom: 10px;
         font-weight: 400;
-        color: var(--text-dark);
-        background-color: var(--accent-negative-light);
+        color: #e9ecef;
+        background-color: rgba(224, 90, 69, 0.15);
         padding: 10px 15px;
         border-radius: 6px;
-        border-left: 4px solid var(--accent-negative);
+        border-left: 4px solid #e05a45;
     }
     
     .assessment-container {
@@ -108,9 +91,9 @@ def render_profile(profile: RollDynamicsProfile) -> None:
         padding: 18px 15px;
         border-radius: 10px;
         font-size: 1.15em;
-        background-color: var(--background-light);
-        color: var(--text-dark);
-        border: 1px solid var(--border-color);
+        background-color: #2a2a2a;
+        color: #e9ecef;
+        border: 1px solid #495057;
         transition: transform 0.2s;
     }
     
@@ -119,34 +102,16 @@ def render_profile(profile: RollDynamicsProfile) -> None:
     }
     
     .level-high {
-        border-left: 4px solid var(--accent-positive);
+        border-left: 4px solid #4db380;
         font-weight: 600;
     }
     
     .level-medium {
-        border-left: 4px solid var(--accent-neutral);
+        border-left: 4px solid #d8b24b;
     }
     
     .level-low {
-        border-left: 4px solid var(--accent-negative);
-    }
-    
-    /* Fix for any Streamlit container backgrounds */
-    .stMarkdown, .stText {
-        background-color: transparent !important;
-    }
-    
-    .element-container {
-        background-color: transparent !important;
-    }
-    
-    /* Make default text readable */
-    body {
-        color: var(--text-dark) !important;
-    }
-    
-    p, div, span {
-        color: var(--text-dark);
+        border-left: 4px solid #e05a45;
     }
     </style>
     """, unsafe_allow_html=True)

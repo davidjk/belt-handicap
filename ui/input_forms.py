@@ -151,7 +151,7 @@ def render_practitioner_form(key_prefix: str, config: JARConfig) -> Practitioner
     # Grappling experience with consistent dark theme styling
     st.markdown(f"""
     <div style="margin-top: 20px; margin-bottom: 15px;">
-        <div class="info-box">
+        <div style="background-color: #2a2a2a; border: 1px solid #495057; color: #adb5bd; padding: 12px; border-radius: 6px; margin: 10px 0;">
             Select your experience in other grappling arts. This significantly impacts your JAR score.
         </div>
     </div>
@@ -207,8 +207,8 @@ def render_practitioner_form(key_prefix: str, config: JARConfig) -> Practitioner
             # Show the impact of the selected experience level
             if experience_level in level_to_effect:
                 st.markdown(f"""
-                <div style="background-color: var(--primary-light); padding: 12px; border-radius: 6px; margin-top: 24px; border: 1px solid var(--border-color);">
-                    <p style="margin: 0; text-align: center; font-weight: bold; font-size: 1.1em; color: var(--primary-color);">
+                <div style="background-color: rgba(79, 146, 211, 0.15); padding: 12px; border-radius: 6px; margin-top: 24px; border: 1px solid #495057;">
+                    <p style="margin: 0; text-align: center; font-weight: bold; font-size: 1.1em; color: #4f92d3;">
                         Score Impact: {level_to_effect[experience_level]}
                     </p>
                 </div>
