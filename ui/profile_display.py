@@ -1,0 +1,355 @@
+import streamlit as st
+from typing import Dict, List, Any
+from jar.types import RollDynamicsProfile
+
+def render_profile(profile: RollDynamicsProfile) -> None:
+    """
+    Render the Roll Dynamics Profile in a structured format.
+    
+    Args:
+        profile: Generated Roll Dynamics Profile
+    """
+    st.markdown("""
+    <style>
+    /* Modern, harmonious color palette */
+    :root {
+        --primary-color: #336699;
+        --primary-light: #f0f7ff;
+        --accent-positive: #2d8659;
+        --accent-positive-light: #eaf7f0;
+        --accent-negative: #994436;
+        --accent-negative-light: #fdf0ee;
+        --accent-neutral: #997a36;
+        --accent-neutral-light: #fdf8e6;
+        --text-dark: #343a40;
+        --text-medium: #495057;
+        --text-light: #6c757d;
+        --border-color: #dee2e6;
+        --background-main: #ffffff;
+        --background-light: #f8f9fa;
+    }
+    
+    .profile-container {
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        background-color: var(--background-main);
+        color: var(--text-dark);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .profile-header {
+        font-size: 1.8em;
+        font-weight: 600;
+        margin-bottom: 18px;
+        color: var(--primary-color);
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .profile-data {
+        font-size: 1.2em;
+        margin-bottom: 12px;
+        color: var(--text-medium);
+        display: flex;
+        align-items: center;
+    }
+    
+    .profile-data strong {
+        min-width: 180px;
+        display: inline-block;
+        color: var(--text-dark);
+    }
+    
+    .profile-section-header {
+        font-size: 1.5em;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 12px;
+        color: var(--primary-color);
+        background: transparent;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .strength-item {
+        font-size: 1.15em;
+        margin-bottom: 10px;
+        font-weight: 400;
+        color: var(--text-dark);
+        background-color: var(--accent-positive-light);
+        padding: 10px 15px;
+        border-radius: 6px;
+        border-left: 4px solid var(--accent-positive);
+    }
+    
+    .challenge-item {
+        font-size: 1.15em;
+        margin-bottom: 10px;
+        font-weight: 400;
+        color: var(--text-dark);
+        background-color: var(--accent-negative-light);
+        padding: 10px 15px;
+        border-radius: 6px;
+        border-left: 4px solid var(--accent-negative);
+    }
+    
+    .assessment-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+        gap: 15px;
+    }
+    
+    .assessment-item {
+        flex: 1;
+        text-align: center;
+        padding: 18px 15px;
+        border-radius: 10px;
+        font-size: 1.15em;
+        background-color: var(--background-light);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s;
+    }
+    
+    .assessment-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .level-high {
+        border-left: 4px solid var(--accent-positive);
+        font-weight: 600;
+    }
+    
+    .level-medium {
+        border-left: 4px solid var(--accent-neutral);
+    }
+    
+    .level-low {
+        border-left: 4px solid var(--accent-negative);
+    }
+    
+    /* Fix for any Streamlit container backgrounds */
+    .stMarkdown, .stText {
+        background-color: transparent !important;
+    }
+    
+    .element-container {
+        background-color: transparent !important;
+    }
+    
+    /* Make default text readable */
+    body {
+        color: var(--text-dark) !important;
+    }
+    
+    p, div, span {
+        color: var(--text-dark);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class="profile-container">
+        <div class="profile-header">Roll Dynamics Profile: {profile.practitioner_name}</div>
+        <p class="profile-data"><strong>Handicapped Score:</strong> {profile.handicapped_score:.2f}</p>
+        <p class="profile-data"><strong>Dominant Trait:</strong> {profile.dominant_trait}</p>
+        <p class="profile-data"><strong>Likely Roll Approach:</strong> {profile.likely_approach}</p>
+        
+        <div class="profile-section-header">Key Strengths</div>
+    """, unsafe_allow_html=True)
+    
+    # Check if key_strengths exists and has content
+    if profile.key_strengths and len(profile.key_strengths) > 0:
+        for strength in profile.key_strengths:
+            st.markdown(f"""
+            <div class="strength-item">• {strength}</div>
+            """, unsafe_allow_html=True)
+    else:
+        # Display a placeholder when no strengths are available
+        st.markdown("""
+        <div class="strength-item">No specific strengths identified</div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div class="profile-section-header">Key Challenges</div>
+    """, unsafe_allow_html=True)
+    
+    # Check if key_challenges exists and has content
+    if profile.key_challenges and len(profile.key_challenges) > 0:
+        for challenge in profile.key_challenges:
+            st.markdown(f"""
+            <div class="challenge-item">• {challenge}</div>
+            """, unsafe_allow_html=True)
+    else:
+        # Display a placeholder when no challenges are available
+        st.markdown("""
+        <div class="challenge-item">No specific challenges identified</div>
+        """, unsafe_allow_html=True)
+    
+    # Create level classes
+    level_classes = {
+        "High": "level-high",
+        "Medium": "level-medium",
+        "Low": "level-low"
+    }
+    
+    st.markdown("""
+        <div class="profile-section-header">Technical Assessment</div>
+        <div class="assessment-container">
+    """, unsafe_allow_html=True)
+    
+    # Display Control Potential
+    st.markdown(f"""
+    <div class="assessment-item {level_classes[profile.control_potential]}">
+        <div style="font-weight: bold; font-size: 1.2em; margin-bottom: 8px;">Control Potential</div>
+        <div style="font-size: 1.3em;">{profile.control_potential}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Display Submission Threat
+    st.markdown(f"""
+    <div class="assessment-item {level_classes[profile.submission_offensive_threat]}">
+        <div style="font-weight: bold; font-size: 1.2em; margin-bottom: 8px;">Submission Threat</div>
+        <div style="font-size: 1.3em;">{profile.submission_offensive_threat}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Display Submission Defense
+    st.markdown(f"""
+    <div class="assessment-item {level_classes[profile.submission_defensive_resilience]}">
+        <div style="font-weight: bold; font-size: 1.2em; margin-bottom: 8px;">Submission Defense</div>
+        <div style="font-size: 1.3em;">{profile.submission_defensive_resilience}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def render_profile_comparison(
+    profile_a: RollDynamicsProfile, 
+    profile_b: RollDynamicsProfile
+) -> None:
+    """
+    Render a side-by-side comparison of two profiles.
+    
+    Args:
+        profile_a: Roll Dynamics Profile for practitioner A
+        profile_b: Roll Dynamics Profile for practitioner B
+    """
+    # Create two columns for the comparison
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader(f"Profile: {profile_a.practitioner_name}")
+        render_profile(profile_a)
+    
+    with col2:
+        st.subheader(f"Profile: {profile_b.practitioner_name}")
+        render_profile(profile_b)
+    
+    # Display a comparison analysis
+    st.subheader("Matchup Analysis")
+    
+    # Calculate score differential
+    score_diff = abs(profile_a.handicapped_score - profile_b.handicapped_score)
+    score_ratio = max(profile_a.handicapped_score, profile_b.handicapped_score) / min(profile_a.handicapped_score, profile_b.handicapped_score)
+    
+    if score_ratio < 1.2:
+        evenness = "Very Even"
+        diff_color = "green"
+    elif score_ratio < 1.5:
+        evenness = "Moderately Even"
+        diff_color = "orange"
+    else:
+        evenness = "Significant Difference"
+        diff_color = "red"
+    
+    # Determine higher-scored practitioner
+    higher_profile = profile_a if profile_a.handicapped_score > profile_b.handicapped_score else profile_b
+    
+    st.markdown(f"""
+    <div class="profile-container" style="margin-top: 30px;">
+        <div class="profile-header">Matchup Analysis</div>
+        <div class="profile-data"><strong>Score Differential:</strong> {score_diff:.2f} points ({evenness})</div>
+        <div class="profile-data"><strong>Matchup Type:</strong> {determine_matchup_type(profile_a, profile_b)}</div>
+        <div style="margin-top: 15px; font-size: 1.2em; line-height: 1.5; padding: 15px; background-color: var(--primary-light); border-radius: 8px;">
+            {generate_matchup_analysis(profile_a, profile_b)}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def determine_matchup_type(
+    profile_a: RollDynamicsProfile, 
+    profile_b: RollDynamicsProfile
+) -> str:
+    """
+    Determine the type of matchup based on the profiles.
+    
+    Args:
+        profile_a: Roll Dynamics Profile for practitioner A
+        profile_b: Roll Dynamics Profile for practitioner B
+        
+    Returns:
+        Description of the matchup type
+    """
+    # Technical vs Physical matchup
+    if profile_a.dominant_trait == "Technical BJJ Specialist" and profile_b.dominant_trait == "Physical Grappling Athlete":
+        return "Technical vs Physical"
+    elif profile_a.dominant_trait == "Physical Grappling Athlete" and profile_b.dominant_trait == "Technical BJJ Specialist":
+        return "Physical vs Technical"
+    
+    # All-rounder matchups
+    if "All-Rounder" in profile_a.dominant_trait or "All-Rounder" in profile_b.dominant_trait:
+        return "All-Rounder Present"
+    
+    # Similar styles
+    if profile_a.dominant_trait == profile_b.dominant_trait:
+        return f"Similar Styles ({profile_a.dominant_trait})"
+    
+    # Default case
+    return "Mixed Styles"
+
+def generate_matchup_analysis(
+    profile_a: RollDynamicsProfile, 
+    profile_b: RollDynamicsProfile
+) -> str:
+    """
+    Generate a narrative analysis of the matchup.
+    
+    Args:
+        profile_a: Roll Dynamics Profile for practitioner A
+        profile_b: Roll Dynamics Profile for practitioner B
+        
+    Returns:
+        Analysis of the matchup dynamics
+    """
+    analysis = []
+    
+    # Control dynamics
+    if profile_a.control_potential == "High" and profile_b.control_potential != "High":
+        analysis.append(f"{profile_a.practitioner_name} likely has a control advantage.")
+    elif profile_b.control_potential == "High" and profile_a.control_potential != "High":
+        analysis.append(f"{profile_b.practitioner_name} likely has a control advantage.")
+    elif profile_a.control_potential == "High" and profile_b.control_potential == "High":
+        analysis.append("Both practitioners have strong control games; expect a battle for dominant position.")
+    
+    # Submission dynamics
+    if profile_a.submission_offensive_threat == "High" and profile_b.submission_defensive_resilience != "High":
+        analysis.append(f"{profile_a.practitioner_name} may find submission opportunities against {profile_b.practitioner_name}.")
+    if profile_b.submission_offensive_threat == "High" and profile_a.submission_defensive_resilience != "High":
+        analysis.append(f"{profile_b.practitioner_name} may find submission opportunities against {profile_a.practitioner_name}.")
+    
+    # Overall approaches that may clash or complement
+    if profile_a.likely_approach == "Pressure & Control-Oriented" and profile_b.likely_approach == "Technical & Opportunistic":
+        analysis.append(f"Expect {profile_a.practitioner_name} to seek dominant position while {profile_b.practitioner_name} looks for technical escapes and counters.")
+    
+    # If we couldn't generate specific insights
+    if not analysis:
+        return "This matchup appears balanced across multiple dimensions. The outcome may depend on specific techniques, timing, and mental aspects not captured in the profile."
+    
+    return " ".join(analysis)
