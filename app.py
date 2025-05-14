@@ -181,14 +181,14 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
             save_name_a = st.text_input("Name for Practitioner A", 
                                         value=st.session_state.practitioner_a_name if "practitioner_a_name" in st.session_state else "", 
                                         key="save_name_a")
-            save_a = st.button("Save Practitioner A")
+            save_a = st.button("Save Practitioner A", key="save_a_btn")
         
         with col2:
             st.write("Practitioner B")
             save_name_b = st.text_input("Name for Practitioner B", 
                                        value=st.session_state.practitioner_b_name if "practitioner_b_name" in st.session_state else "", 
                                        key="save_name_b")
-            save_b = st.button("Save Practitioner B")
+            save_b = st.button("Save Practitioner B", key="save_b_btn")
         
         # Horizontal separator
         st.markdown("---")
@@ -208,7 +208,7 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
                     index=0,
                     key="selected_a"
                 )
-                load_a = st.button("Load as A")
+                load_a = st.button("Load as A", key="load_a_btn")
             
             with col2:
                 st.write("Select for Position B")
@@ -218,7 +218,7 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
                     index=0,
                     key="selected_b"
                 )
-                load_b = st.button("Load as B")
+                load_b = st.button("Load as B", key="load_b_btn")
             
             # Delete practitioner
             st.markdown("---")
@@ -233,7 +233,7 @@ def compare_practitioners_view(calculator: Calculator, profile_generator: Profil
                 )
             
             with col2:
-                delete_btn = st.button("Delete", type="primary", use_container_width=True)
+                delete_btn = st.button("Delete", key="delete_btn", type="primary", use_container_width=True)
                 
             if delete_btn and to_delete:
                 if to_delete in st.session_state.saved_practitioners:
