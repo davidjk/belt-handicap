@@ -364,22 +364,33 @@ def about_view():
     st.markdown("""
     ### How to Use This App:
     
-    #### Single Practitioner Analysis
-    1. Enter the practitioner's details
-    2. Click "Calculate Score" to see their Handicapped Score and profile
-    3. Review the factor breakdown to understand which attributes are contributing most
+    #### Interactive Practitioner Comparison
+    1. Fill in details for both practitioners - notice how scores update instantly
+    2. See the impact percentage next to each attribute to understand its contribution
+    3. The large score display at the top of each practitioner updates in real-time
+    4. Click "Compare Practitioners" for detailed radar charts and matchup profiles
     
-    #### Compare Practitioners
-    1. Enter details for both practitioners
-    2. Click "Compare" to see a side-by-side analysis
-    3. Review the matchup assessment for insights on how the roll might unfold
+    #### Managing Practitioner Pairs
+    1. Enter a name in the "Pair Name" field 
+    2. Click "Save Current" to store the current practitioner pair
+    3. Use the dropdown to select previously saved pairs
+    4. Click "Load Selected Pair" to retrieve saved practitioners
     
-    #### Configuration
-    The system is fully configurable. Advanced users can modify parameters like:
-    - Belt rank scores
-    - Age factor calculations
-    - Weight difference impact
-    - Other factor multipliers
+    #### Understanding the Factors
+    - **Belt Rank Score (BRS)**: Your base score determined by belt rank
+    - **Age Factor (AF)**: Adjustment based on age relative to peak performance age
+    - **Weight Factor (WF)**: Adjustment based on weight difference between practitioners
+    - **Athleticism Factor (ACF)**: Modification based on general physical capabilities
+    - **Grappling Experience (REF)**: Bonus for relevant experience in other grappling arts
+    - **Training Frequency (TFF)**: Impact of regular BJJ training sessions per week
+    - **Competition Experience (CEF)**: Bonus for BJJ competition experience
+    
+    #### Configuration (Advanced)
+    The system is fully customizable in the Configuration tab below:
+    - Change belt rank base scores
+    - Adjust age-related calculations
+    - Modify weight difference impacts
+    - Fine-tune all other multipliers
     
     ### Disclaimer
     This is a conceptual tool meant to enhance understanding and discussion, not to replace 

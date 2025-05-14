@@ -18,11 +18,13 @@ The system also generates a Roll Dynamics Profile that provides qualitative insi
 
 ## Features
 
-- **Single Practitioner Analysis**: Calculate and visualize a practitioner's Handicapped Score and profile
-- **Practitioner Comparison**: Compare two practitioners side-by-side with visualization of differences
-- **Factor Visualization**: Interactive charts showing the contribution of each factor to the final score
-- **Roll Dynamics Profiles**: Qualitative assessments of practitioner strengths, challenges, and likely roll approaches
+- **Live Interactive Scoring**: Scores update in real-time as you adjust any attribute
+- **Impact Visualization**: Clear display of how each factor affects the final score with percentage indicators
+- **Practitioner Comparison**: Side-by-side comparison with intuitive visualization of differences
+- **Roll Dynamics Profiles**: Qualitative assessments of strengths, challenges, and likely roll approaches
+- **Save Practitioner Pairs**: Store frequently compared practitioners for quick access
 - **Configurable System**: All parameters can be customized through the UI
+- **Dark Theme**: Enhanced readability with a dark theme throughout the application
 
 ## Installation
 
@@ -61,11 +63,13 @@ streamlit run app.py
 
 ## Usage
 
-1. Navigate to the "Single Practitioner" page to analyze an individual
-2. Input practitioner details and click "Calculate Score"
-3. Review the factor breakdown and Roll Dynamics Profile
-4. Use the "Compare Practitioners" page to assess two practitioners against each other
-5. Advanced users can modify system parameters in the "Configuration" page
+1. Input details for two practitioners in the comparison view
+2. Watch scores update in real-time as you adjust values
+3. See the percentage impact of each attribute next to the input
+4. Click "Compare Practitioners" to view detailed radar charts and profiles
+5. Save frequently used pairs with the "Save Current" button
+6. Load saved pairs for quick comparison
+7. Advanced users can modify system parameters in the "Configuration" tab
 
 ## Contributing
 
