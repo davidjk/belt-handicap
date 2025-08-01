@@ -6,22 +6,24 @@ export class ConfigManager {
             "belt_rank_scores": {
                 "White": 100,
                 "Blue": 200,
-                "Purple": 350,
-                "Brown": 550,
-                "Black": 800
+                "Purple": 275,
+                "Brown": 325,
+                "Black": 350
             },
             "age_factor_config": {
-                "peak_age_years": 25,
-                "youthful_factor_multiplier": 1.03,
-                "power_decline_rate_per_decade": 0.12
+                "age_brackets": [
+                    { "age_min": 18, "age_max": 22, "multiplier": 1.15 },
+                    { "age_min": 23, "age_max": 28, "multiplier": 1.05 },
+                    { "age_min": 29, "age_max": 35, "multiplier": 1.0 },
+                    { "age_min": 36, "age_max": 40, "multiplier": 0.90 },
+                    { "age_min": 41, "age_max": 45, "multiplier": 0.80 },
+                    { "age_min": 46, "age_max": 100, "multiplier": 0.70 }
+                ]
             },
             "weight_factor_config": {
-                "increment_lbs": 15.0,
-                "thresholds_bonuses_penalties": [
-                    { "diff_max_lbs": 15.0, "adjustment": 0.06 },
-                    { "diff_max_lbs": 30.0, "adjustment": 0.08 },
-                    { "diff_max_lbs": 45.0, "adjustment": 0.10 }
-                ]
+                "base_increment_lbs": 15.0,
+                "exponential_scaling_factor": 1.3,
+                "base_adjustment_rate": 0.05
             },
             "acf_config": {
                 "levels": [

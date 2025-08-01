@@ -15,22 +15,25 @@ export class JARCalculator {
     }
     
     /**
-     * Calculate Age Factor (AF)
+     * Calculate Age Factor (AF) using age brackets
      */
     calculateAF(practitioner) {
         const ageConfig = this.config.age_factor_config;
-        const peakAge = ageConfig.peak_age_years;
+        const age = practitioner.ageYears;
         
-        if (practitioner.ageYears < peakAge) {
-            return ageConfig.youthful_factor_multiplier;
+        // Find appropriate age bracket
+        for (const bracket of ageConfig.age_brackets) {
+            if (age >= bracket.age_min && age <= bracket.age_max) {
+                return bracket.multiplier;
+            }
         }
         
-        const decadesPastPeak = (practitioner.ageYears - peakAge) / 10.0;
-        return Math.pow(1.0 - ageConfig.power_decline_rate_per_decade, decadesPastPeak);
+        // Default to neutral if age is outside all brackets
+        return 1.0;
     }
     
     /**
-     * Calculate Weight/Size Factor (WF)
+     * Calculate Weight/Size Factor (WF) using exponential scaling
      */
     calculateWF(practitioner, comparisonPractitioner) {
         if (!comparisonPractitioner) {
@@ -47,40 +50,16 @@ export class JARCalculator {
         // Determine if this practitioner is heavier or lighter
         const isHeavier = practitioner.weightLbs > comparisonPractitioner.weightLbs;
         
-        // Calculate adjustment using threshold tiers
-        let totalAdjustment = 0.0;
-        let remainingDiff = weightDifference;
-        let lastTierMaxLbs = 0.0;
-        let highestTierAdjustment = 0.0;
+        // Calculate exponential adjustment: (weight_diff / base_increment)^scaling_factor * base_rate
+        const baseIncrement = weightConfig.base_increment_lbs;
+        const scalingFactor = weightConfig.exponential_scaling_factor;
+        const baseRate = weightConfig.base_adjustment_rate;
         
-        for (const tier of weightConfig.thresholds_bonuses_penalties) {
-            const lbsCoveredByThisTier = tier.diff_max_lbs - lastTierMaxLbs;
-            const lbsToConsider = Math.min(remainingDiff, lbsCoveredByThisTier);
-            
-            if (lbsToConsider <= 0) {
-                break;
-            }
-            
-            const tierAdjustment = (lbsToConsider / weightConfig.increment_lbs) * tier.adjustment;
-            totalAdjustment += tierAdjustment;
-            highestTierAdjustment = tier.adjustment; // Keep track of highest tier adjustment
-            
-            remainingDiff -= lbsToConsider;
-            lastTierMaxLbs = tier.diff_max_lbs;
-            
-            if (remainingDiff <= 0) {
-                break;
-            }
-        }
-        
-        // Handle any remaining weight difference using the highest tier adjustment
-        if (remainingDiff > 0 && highestTierAdjustment > 0) {
-            const tierAdjustment = (remainingDiff / weightConfig.increment_lbs) * highestTierAdjustment;
-            totalAdjustment += tierAdjustment;
-        }
+        const weightRatio = weightDifference / baseIncrement;
+        const exponentialAdjustment = Math.pow(weightRatio, scalingFactor) * baseRate;
         
         // Apply adjustment based on whether practitioner is heavier or lighter
-        return isHeavier ? 1.0 + totalAdjustment : 1.0 - totalAdjustment;
+        return isHeavier ? 1.0 + exponentialAdjustment : 1.0 - exponentialAdjustment;
     }
     
     /**
