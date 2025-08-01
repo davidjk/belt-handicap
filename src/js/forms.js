@@ -1,4 +1,4 @@
-import { PractitionerData, BeltRanks, GrapplingArts, WrestlingLevels, JudoLevels, OtherGrapplingLevels, CompetitionLevels, ActivityLevels } from './types.js';
+import { PractitionerData, BeltRanks, GrapplingArts, WrestlingLevels, JudoLevels, OtherGrapplingLevels, CompetitionLevels } from './types.js';
 
 export class PractitionerForm {
     constructor(containerId, practitionerId) {
@@ -25,14 +25,17 @@ export class PractitionerForm {
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="${this.practitionerId}-belt">BJJ Belt Rank</label>
-                    <select id="${this.practitionerId}-belt" class="form-select" data-field="bjjBeltRank">
+                    <label class="form-label">BJJ Belt Rank</label>
+                    <div class="belt-selection" id="${this.practitionerId}-belt-selection" data-field="bjjBeltRank">
                         ${Object.values(BeltRanks).map(belt => 
-                            `<option value="${belt}">
-                                ${belt}
-                            </option>`
+                            `<div class="belt-block belt-${belt.toLowerCase()}" 
+                                 data-belt="${belt}" 
+                                 title="${belt} Belt">
+                                <span class="belt-label">${belt}</span>
+                            </div>`
                         ).join('')}
-                    </select>
+                    </div>
+                    <input type="hidden" id="${this.practitionerId}-belt" data-field="bjjBeltRank" value="${BeltRanks.WHITE}">
                 </div>
                 
                 <div class="form-group">
@@ -59,16 +62,6 @@ export class PractitionerForm {
                         data-field="weightLbs">
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label" for="${this.practitionerId}-activity">Primary Occupation Activity Level</label>
-                    <select id="${this.practitionerId}-activity" class="form-select" data-field="primaryOccupationActivityLevel">
-                        ${Object.values(ActivityLevels).map(level => 
-                            `<option value="${level}" ${level === ActivityLevels.MODERATELY_ACTIVE ? 'selected' : ''}>
-                                ${level}
-                            </option>`
-                        ).join('')}
-                    </select>
-                </div>
                 
                 <div class="form-group">
                     <label class="form-label" for="${this.practitionerId}-fitness">Fitness Test Percentile</label>
@@ -84,7 +77,9 @@ export class PractitionerForm {
                         value="50"
                         data-field="standardizedFitnessTestPercentileEstimate">
                     <div class="range-value">
-                        <span id="${this.practitionerId}-fitness-value">50</span>th percentile
+                        <div class="percentile-display">
+                            <span id="${this.practitionerId}-fitness-value">50</span><span class="percentile-suffix">th percentile</span>
+                        </div>
                         <div class="fitness-guide" id="${this.practitionerId}-fitness-guide">
                             Average fitness level
                         </div>
@@ -140,13 +135,19 @@ export class PractitionerForm {
         
         const updateFitnessGuide = (value) => {
             let guide = '';
-            if (value < 10) guide = 'Very low fitness - rarely exercise';
-            else if (value < 30) guide = 'Below average - occasional light exercise';
-            else if (value < 50) guide = 'Average fitness - some regular activity';
-            else if (value < 70) guide = 'Above average - regular exercise routine';
-            else if (value < 85) guide = 'Good fitness - frequent intense exercise';
-            else if (value < 95) guide = 'Very fit - athlete/fitness enthusiast';
-            else guide = 'Elite fitness - competitive athlete level';
+            if (value <= 5) guide = 'Basement dwelling snack monster 🍕';
+            else if (value <= 15) guide = 'Couch potato - stairs are the enemy 🛋️';
+            else if (value <= 25) guide = 'Getting winded tying shoes 👟';
+            else if (value <= 35) guide = 'Weekend warrior wannabe 🏃‍♂️';
+            else if (value <= 45) guide = 'Casual gym visitor - sometimes 💪';
+            else if (value <= 55) guide = 'Average fitness - can handle stairs 🚶';
+            else if (value <= 65) guide = 'Above average - regular gym goer 💪';
+            else if (value <= 75) guide = 'Pretty fit - enjoys working out 🏋️';
+            else if (value <= 85) guide = 'Very fit - fitness is a lifestyle 🔥';
+            else if (value <= 90) guide = 'Athlete level - others are jealous 🏆';
+            else if (value <= 95) guide = 'Elite fitness - gym inspiration 💎';
+            else if (value <= 99) guide = 'Adonis level - Greek god physique ⚡';
+            else guide = 'Superhuman - probably not natural 🦸‍♂️';
             
             guideDisplay.textContent = guide;
         };
@@ -161,16 +162,35 @@ export class PractitionerForm {
     }
     
     addBeltIndicators() {
-        const beltSelect = this.container.querySelector(`#${this.practitionerId}-belt`);
+        const beltSelection = this.container.querySelector(`#${this.practitionerId}-belt-selection`);
+        const hiddenInput = this.container.querySelector(`#${this.practitionerId}-belt`);
         
-        // Add belt color indicators to options
-        beltSelect.addEventListener('change', (e) => {
-            const selectedBelt = e.target.value.toLowerCase().replace(' ', '-');
-            e.target.className = `form-select belt-${selectedBelt}`;
+        // Add click handlers to belt blocks
+        beltSelection.addEventListener('click', (e) => {
+            const beltBlock = e.target.closest('.belt-block');
+            if (!beltBlock) return;
+            
+            // Remove active class from all blocks
+            beltSelection.querySelectorAll('.belt-block').forEach(block => {
+                block.classList.remove('active');
+            });
+            
+            // Add active class to clicked block
+            beltBlock.classList.add('active');
+            
+            // Update hidden input value
+            const selectedBelt = beltBlock.getAttribute('data-belt');
+            hiddenInput.value = selectedBelt;
+            
+            // Trigger form update
+            this.handleFormUpdate();
         });
         
-        // Trigger initial styling
-        beltSelect.dispatchEvent(new Event('change'));
+        // Set initial selection to white belt
+        const whiteBelt = beltSelection.querySelector('.belt-block[data-belt="White"]');
+        if (whiteBelt) {
+            whiteBelt.classList.add('active');
+        }
     }
     
     setupGrapplingExperienceDropdowns() {
@@ -329,10 +349,19 @@ export class PractitionerForm {
             
             // Populate form fields
             this.container.querySelector(`#${this.practitionerId}-name`).value = practitioner.name || '';
+            
+            // Handle belt selection
             this.container.querySelector(`#${this.practitionerId}-belt`).value = practitioner.bjjBeltRank;
+            // Update belt block selection
+            const beltSelection = this.container.querySelector(`#${this.practitionerId}-belt-selection`);
+            beltSelection.querySelectorAll('.belt-block').forEach(block => {
+                block.classList.remove('active');
+                if (block.getAttribute('data-belt') === practitioner.bjjBeltRank) {
+                    block.classList.add('active');
+                }
+            });
             this.container.querySelector(`#${this.practitionerId}-age`).value = practitioner.ageYears;
             this.container.querySelector(`#${this.practitionerId}-weight`).value = practitioner.weightLbs;
-            this.container.querySelector(`#${this.practitionerId}-activity`).value = practitioner.primaryOccupationActivityLevel;
             this.container.querySelector(`#${this.practitionerId}-fitness`).value = practitioner.standardizedFitnessTestPercentileEstimate;
             this.container.querySelector(`#${this.practitionerId}-training`).value = practitioner.bjjTrainingSessionsPerWeek;
             this.container.querySelector(`#${this.practitionerId}-competition`).value = practitioner.bjjCompetitionExperienceLevel;
@@ -346,9 +375,6 @@ export class PractitionerForm {
             
             // Update fitness display
             this.container.querySelector(`#${this.practitionerId}-fitness-value`).textContent = practitioner.standardizedFitnessTestPercentileEstimate;
-            
-            // Trigger belt styling
-            this.container.querySelector(`#${this.practitionerId}-belt`).dispatchEvent(new Event('change'));
             
             this.currentData = practitioner;
             

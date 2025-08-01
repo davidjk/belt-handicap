@@ -50,11 +50,6 @@ export const CompetitionLevels = {
     NATIONAL_INTERNATIONAL: 'National/International'
 };
 
-export const ActivityLevels = {
-    SEDENTARY: 'Sedentary (Desk Job)',
-    MODERATELY_ACTIVE: 'Moderately Active',
-    PHYSICALLY_DEMANDING: 'Physically Demanding'
-};
 
 // Data classes
 export class GrapplingExperience {
@@ -70,7 +65,6 @@ export class PractitionerData {
         bjjBeltRank = BeltRanks.WHITE,
         ageYears = 25,
         weightLbs = 170,
-        primaryOccupationActivityLevel = ActivityLevels.MODERATELY_ACTIVE,
         standardizedFitnessTestPercentileEstimate = 50,
         otherGrapplingArtExperience = [],
         bjjTrainingSessionsPerWeek = 3,
@@ -81,7 +75,6 @@ export class PractitionerData {
         this.bjjBeltRank = bjjBeltRank;
         this.ageYears = ageYears;
         this.weightLbs = weightLbs;
-        this.primaryOccupationActivityLevel = primaryOccupationActivityLevel;
         this.standardizedFitnessTestPercentileEstimate = standardizedFitnessTestPercentileEstimate;
         this.otherGrapplingArtExperience = otherGrapplingArtExperience;
         this.bjjTrainingSessionsPerWeek = bjjTrainingSessionsPerWeek;
