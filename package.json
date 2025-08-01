@@ -1,0 +1,22 @@
+{
+  "name": "jar-bjj-calculator",
+  "version": "1.0.0",
+  "description": "JAR (Jiu-Jitsu Attribute Rating) System - A handicapped scoring system for Brazilian Jiu-Jitsu practitioners",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  },
+  "keywords": ["bjj", "jiu-jitsu", "calculator", "handicap", "martial-arts"],
+  "author": "JAR System",
+  "license": "MIT"
+}

@@ -1,0 +1,23 @@
+{
+  "Gorilla": {
+    "name": "Gorilla",
+    "belt": "White",
+    "age": 22,
+    "weight": 220.0,
+    "fitness": 97,
+    "sessions": 4,
+    "competition": "Limited Local",
+    "art": "Wrestling",
+    "exp_level": "High-Level Competitor (National level)"
+  },
+  "Technician": {
+    "name": "Technician",
+    "belt": "Purple",
+    "age": 50,
+    "weight": 180.0,
+    "fitness": 70,
+    "sessions": 4,
+    "competition": "Limited Local",
+    "art": "None"
+  }
+}
