@@ -1,6 +1,6 @@
-# Belt Handicap (JAR System)
+# JAR System - Jiu-Jitsu Attribute Rating
 
-A Streamlit application implementing the Jiu-Jitsu Attribute Rating (JAR) system, which provides a multi-factor approach to assessing and comparing Brazilian Jiu-Jitsu practitioners beyond belt rank alone.
+A modern web application implementing the Jiu-Jitsu Attribute Rating (JAR) system, which provides a multi-factor approach to assessing and comparing Brazilian Jiu-Jitsu practitioners beyond belt rank alone.
 
 ## Overview
 
@@ -19,14 +19,14 @@ The system also generates a Roll Dynamics Profile that provides qualitative insi
 ## Features
 
 - **Live Interactive Scoring**: Scores update in real-time as you adjust any attribute
-- **Impact Visualization**: Clear display of how each factor affects the final score with percentage indicators
+- **Animated Radar Charts**: Dynamic visualizations with smooth transitions using Chart.js
+- **Modern UI**: Clean, professional interface with smooth animations and micro-interactions
 - **Practitioner Comparison**: Side-by-side comparison with intuitive visualization of differences
 - **Roll Dynamics Profiles**: Qualitative assessments of strengths, challenges, and likely roll approaches
-- **Save Practitioner Pairs**: Store frequently compared practitioners for quick access
-- **Configurable System**: All parameters can be customized through the UI
-- **Dark Theme**: Enhanced readability with a dark theme throughout the application
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Performance Optimized**: Fast, client-side calculations with no server dependency
 
-## Installation
+## Installation & Development
 
 1. Clone the repository:
 ```bash
@@ -36,40 +36,60 @@ cd belt-handicap
 
 2. Install dependencies:
 ```bash
-pip install -r requirements.txt
+npm install
 ```
 
-3. Run the Streamlit app:
+3. Start the development server:
 ```bash
-streamlit run app.py
+npm run dev
+```
+
+4. Build for production:
+```bash
+npm run build
 ```
 
 ## Project Structure
 
-- `app.py`: Main Streamlit application entry point
-- `jar/`: Core JAR system logic
-  - `types.py`: Data types and models
-  - `calculator.py`: Factor calculation functions
-  - `config.py`: Configuration handling
-  - `profiles.py`: Roll Dynamics Profile generation
-- `ui/`: UI components
-  - `input_forms.py`: Practitioner data input forms
-  - `visualizations.py`: Data visualization components
-  - `profile_display.py`: Profile rendering
-- `data/`: Configuration and example data
+- `index.html`: Main application entry point
+- `src/`: Source code
+  - `main.js`: Application initialization and coordination
+  - `js/`: Core JavaScript modules
+    - `calculator.js`: Factor calculation functions
+    - `types.js`: Data types and models
+    - `config.js`: Configuration handling
+    - `profiles.js`: Roll Dynamics Profile generation
+    - `forms.js`: Form handling and input management
+    - `chart.js`: Radar chart visualization
+    - `storage.js`: Local storage utilities
+  - `css/`: Styling
+    - `main.css`: Main stylesheet with modern design system
+- `data/`: Configuration files
 - `docs/`: Documentation
   - `initial_prd.md`: Original product requirements
   - `streamlit_implementation.md`: Implementation guide
+- `archive/`: Archived Streamlit prototype
 
 ## Usage
 
-1. Input details for two practitioners in the comparison view
-2. Watch scores update in real-time as you adjust values
-3. See the percentage impact of each attribute next to the input
-4. Click "Compare Practitioners" to view detailed radar charts and profiles
-5. Save frequently used pairs with the "Save Current" button
-6. Load saved pairs for quick comparison
-7. Advanced users can modify system parameters in the "Configuration" tab
+1. Open the application in your web browser
+2. Input details for two practitioners using the form fields
+3. Watch scores update in real-time as you adjust values
+4. View the dynamic radar chart comparing both practitioners
+5. Read the Roll Dynamics Profiles for qualitative analysis
+6. All calculations happen instantly in your browser - no server required
+
+## Technology Stack
+
+- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
+- **Build Tool**: Vite for fast development and optimized builds
+- **Visualization**: Chart.js for animated radar charts
+- **Styling**: Modern CSS with custom properties and animations
+- **Deployment**: Static hosting (GitHub Pages compatible)
+
+## Archive Note
+
+The original Python/Streamlit prototype has been archived in the `archive/streamlit-prototype/` directory. The current implementation uses vanilla JavaScript for better performance and user experience.
 
 ## Contributing
 

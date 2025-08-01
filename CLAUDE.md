@@ -4,48 +4,61 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The JAR (Jiu-Jitsu Attribute Rating) System is a Streamlit web application that calculates handicapped scores for Brazilian Jiu-Jitsu practitioners using seven factors beyond belt rank. It provides both quantitative scoring and qualitative "Roll Dynamics Profiles" for practitioner comparison.
+The JAR (Jiu-Jitsu Attribute Rating) System is a modern vanilla JavaScript web application that calculates handicapped scores for Brazilian Jiu-Jitsu practitioners using seven factors beyond belt rank. It provides both quantitative scoring and qualitative "Roll Dynamics Profiles" for practitioner comparison.
+
+**Current Implementation**: Vanilla JavaScript + Vite + Chart.js  
+**Archived Implementation**: Python/Streamlit prototype (see `archive/streamlit-prototype/`)
 
 ## Development Commands
 
 ### Running the Application
 ```bash
-streamlit run app.py
+npm run dev
+```
+
+### Building for Production
+```bash
+npm run build
 ```
 
 ### Testing
 ```bash
-python -m pytest tests/
-python -m pytest tests/test_calculator.py::TestCalculator::test_specific_method  # Single test
-python -m pytest -v  # Verbose output
+npm test
 ```
 
 ### Dependencies
 ```bash
-pip install -r requirements.txt
+npm install
 ```
 
 ## Architecture Overview
 
 ### Core Calculation Flow
 1. Seven factors calculated: BRS × AF × WF × ACF × REF × TFF × CEF = Handicapped Score
-2. Real-time updates on any input change via Streamlit callbacks
+2. Real-time updates on any input change via JavaScript event listeners
 3. Qualitative profile generation based on factor significance thresholds
+4. Dynamic radar chart visualization with Chart.js animations
 
 ### Module Structure
-- **jar/**: Core business logic with four key modules:
-  - `types.py`: Strongly-typed data models (`PractitionerData`, `FactorResults`, `RollDynamicsProfile`)
-  - `calculator.py`: Seven-factor calculation engine with configuration-driven parameters
-  - `config.py`: JSON-based configuration management with TypedDict validation
-  - `profiles.py`: Qualitative analysis engine that converts scores to descriptive profiles
-- **ui/**: Streamlit interface components with real-time reactivity
-- **data/**: Configuration and practitioner storage (JSON persistence)
+- **src/js/**: Core business logic with JavaScript modules:
+  - `types.js`: Data models and type definitions
+  - `calculator.js`: Seven-factor calculation engine with configuration-driven parameters
+  - `config.js`: JSON-based configuration management
+  - `profiles.js`: Qualitative analysis engine that converts scores to descriptive profiles
+  - `forms.js`: Form handling and input management
+  - `chart.js`: Radar chart visualization with Chart.js
+  - `storage.js`: Local storage utilities
+- **src/css/**: Modern styling with CSS custom properties and animations
+- **data/**: Configuration files (JSON)
+- **archive/streamlit-prototype/**: Archived Python/Streamlit implementation
 
 ### Key Design Patterns
 - **Configuration-Driven**: All parameters externalized to `data/default_config.json`
-- **Type Safety**: Extensive use of dataclasses, TypedDict, and Literal types
-- **Real-time Reactivity**: Instant score updates using Streamlit session state and callbacks
+- **Modern JavaScript**: ES6+ modules with clean separation of concerns
+- **Real-time Reactivity**: Instant score updates using JavaScript event listeners and DOM manipulation
 - **Immutable Calculations**: Pure functions for factor calculations
+- **Client-side Only**: No server dependency, all calculations run in browser
+- **Performance Optimized**: Minimal bundle size with Vite build optimization
 
 ## Data Models & Types
 
@@ -60,7 +73,7 @@ Seven factors with specific purposes:
 - **CEF**: Competition Experience Factor (BJJ competition history)
 
 ### State Management
-Complex session state handling prevents cross-contamination between practitioners A and B. Special `_loaded` keys preserve original data when practitioners are loaded from saved data.
+Client-side state management using JavaScript objects and local storage. Clean separation between practitioners A and B data prevents cross-contamination.
 
 ## Configuration System
 
@@ -73,29 +86,44 @@ The application is fully configurable via `data/default_config.json`. Key config
 ## Adding New Features
 
 ### New Calculation Factors
-1. Update `FactorResults` dataclass in `jar/types.py`
-2. Add calculation method in `jar/calculator.py`
-3. Update configuration schema and add parameters to `default_config.json`
-4. Add UI inputs in `ui/input_forms.py`
-5. Update tests in `tests/test_calculator.py`
+1. Update data models in `src/js/types.js`
+2. Add calculation method in `src/js/calculator.js`
+3. Update configuration schema and add parameters to `data/default_config.json`
+4. Add UI inputs in `src/js/forms.js`
+5. Update radar chart configuration in `src/js/chart.js`
+6. Add corresponding tests
 
 ### UI Components
-- Follow existing patterns in `ui/` modules
-- Use session state for reactive updates
-- Maintain dark theme consistency
-- Add impact indicators for new factors
+- Follow modern CSS patterns with custom properties
+- Use JavaScript event listeners for reactive updates
+- Maintain consistent design system with animations
+- Add smooth transitions for new visual elements
 
 ## Testing Strategy
 
-Unit tests focus on calculation logic correctness. Key test patterns:
+Unit tests focus on calculation logic correctness using Vitest. Key test patterns:
 - Configuration loading and validation
 - Factor calculation accuracy
 - Edge case handling (invalid inputs, missing data)
 - Profile generation logic
+- DOM manipulation and event handling
 
 ## Data Persistence
 
-Practitioners are saved to `data/saved_practitioners.json`. The system handles:
-- Loading practitioners into forms
-- Preventing data loss during edits
-- Maintaining comparison state between practitioners A and B
+The current implementation is focused on real-time calculation without persistence. Local storage utilities are available in `src/js/storage.js` for future features:
+- Configuration preferences
+- Recent calculations
+- Custom factor weights
+
+## Archive Note
+
+The original Python/Streamlit implementation has been moved to `archive/streamlit-prototype/`. That implementation included:
+- Practitioner data persistence to JSON files
+- Complex session state management
+- Python-based calculation engine
+- Streamlit UI components
+
+Refer to the archived implementation for:
+- Alternative calculation approaches
+- Data persistence patterns
+- Testing strategies for Python code
