@@ -34,7 +34,7 @@ class Calculator:
     
     def calculate_af(self, practitioner: PractitionerData) -> float:
         """
-        Calculate Age Factor (AF).
+        Calculate Age Factor (AF) using age brackets.
         
         Args:
             practitioner: Practitioner data
@@ -43,13 +43,15 @@ class Calculator:
             Age Factor multiplier
         """
         age_config = self.config["age_factor_config"]
-        peak_age = age_config["peak_age_years"]
+        age = practitioner.age_years
         
-        if practitioner.age_years < peak_age:
-            return age_config["youthful_factor_multiplier"]
+        # Find appropriate age bracket
+        for bracket in age_config["age_brackets"]:
+            if bracket["age_min"] <= age <= bracket["age_max"]:
+                return bracket["multiplier"]
         
-        decades_past_peak = (practitioner.age_years - peak_age) / 10.0
-        return (1.0 - age_config["power_decline_rate_per_decade"]) ** decades_past_peak
+        # Default to neutral if age is outside all brackets
+        return 1.0
     
     def calculate_wf(
         self, 
@@ -57,7 +59,7 @@ class Calculator:
         comparison_practitioner: Optional[PractitionerData]
     ) -> float:
         """
-        Calculate Weight/Size Factor (WF).
+        Calculate Weight/Size Factor (WF) using exponential scaling.
         
         Args:
             practitioner: Practitioner data
@@ -78,36 +80,16 @@ class Calculator:
         # Determine if this practitioner is heavier or lighter
         is_heavier = practitioner.weight_lbs > comparison_practitioner.weight_lbs
         
-        # Calculate adjustment using threshold tiers
-        total_adjustment = 0.0
-        remaining_diff = weight_difference
-        last_tier_max_lbs = 0.0
-        highest_tier_adjustment = 0.0
+        # Calculate exponential adjustment: (weight_diff / base_increment)^scaling_factor * base_rate
+        base_increment = weight_config["base_increment_lbs"]
+        scaling_factor = weight_config["exponential_scaling_factor"]
+        base_rate = weight_config["base_adjustment_rate"]
         
-        for tier in weight_config["thresholds_bonuses_penalties"]:
-            lbs_covered_by_this_tier = tier["diff_max_lbs"] - last_tier_max_lbs
-            lbs_to_consider = min(remaining_diff, lbs_covered_by_this_tier)
-            
-            if lbs_to_consider <= 0:
-                break
-                
-            tier_adjustment = (lbs_to_consider / weight_config["increment_lbs"]) * tier["adjustment"]
-            total_adjustment += tier_adjustment
-            highest_tier_adjustment = tier["adjustment"]  # Keep track of highest tier adjustment
-            
-            remaining_diff -= lbs_to_consider
-            last_tier_max_lbs = tier["diff_max_lbs"]
-            
-            if remaining_diff <= 0:
-                break
-        
-        # Handle any remaining weight difference using the highest tier adjustment
-        if remaining_diff > 0 and highest_tier_adjustment > 0:
-            tier_adjustment = (remaining_diff / weight_config["increment_lbs"]) * highest_tier_adjustment
-            total_adjustment += tier_adjustment
+        weight_ratio = weight_difference / base_increment
+        exponential_adjustment = (weight_ratio ** scaling_factor) * base_rate
         
         # Apply adjustment based on whether practitioner is heavier or lighter
-        return 1.0 + total_adjustment if is_heavier else 1.0 - total_adjustment
+        return 1.0 + exponential_adjustment if is_heavier else 1.0 - exponential_adjustment
     
     def calculate_acf(self, practitioner: PractitionerData) -> float:
         """
