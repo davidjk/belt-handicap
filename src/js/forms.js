@@ -1,4 +1,4 @@
-import { PractitionerData, BeltRanks, GrapplingArts, ExperienceLevels, CompetitionLevels, ActivityLevels } from './types.js';
+import { PractitionerData, BeltRanks, GrapplingArts, WrestlingLevels, JudoLevels, OtherGrapplingLevels, CompetitionLevels, ActivityLevels } from './types.js';
 
 export class PractitionerForm {
     constructor(containerId, practitionerId) {
@@ -72,6 +72,9 @@ export class PractitionerForm {
                 
                 <div class="form-group">
                     <label class="form-label" for="${this.practitionerId}-fitness">Fitness Test Percentile</label>
+                    <div class="fitness-description">
+                        <small>Rate your overall fitness compared to others your age/gender:</small>
+                    </div>
                     <input 
                         type="range" 
                         id="${this.practitionerId}-fitness" 
@@ -82,6 +85,9 @@ export class PractitionerForm {
                         data-field="standardizedFitnessTestPercentileEstimate">
                     <div class="range-value">
                         <span id="${this.practitionerId}-fitness-value">50</span>th percentile
+                        <div class="fitness-guide" id="${this.practitionerId}-fitness-guide">
+                            Average fitness level
+                        </div>
                     </div>
                 </div>
                 
@@ -94,9 +100,7 @@ export class PractitionerForm {
                             ).join('')}
                         </select>
                         <select id="${this.practitionerId}-grappling-level" class="form-select mt-sm">
-                            ${Object.values(ExperienceLevels).map(level => 
-                                `<option value="${level}">${level}</option>`
-                            ).join('')}
+                            <!-- Dynamically populated based on art selection -->
                         </select>
                     </div>
                 </div>
@@ -126,15 +130,34 @@ export class PractitionerForm {
         
         this.addRangeValueDisplay();
         this.addBeltIndicators();
+        this.setupGrapplingExperienceDropdowns();
     }
     
     addRangeValueDisplay() {
         const rangeInput = this.container.querySelector(`#${this.practitionerId}-fitness`);
         const valueDisplay = this.container.querySelector(`#${this.practitionerId}-fitness-value`);
+        const guideDisplay = this.container.querySelector(`#${this.practitionerId}-fitness-guide`);
+        
+        const updateFitnessGuide = (value) => {
+            let guide = '';
+            if (value < 10) guide = 'Very low fitness - rarely exercise';
+            else if (value < 30) guide = 'Below average - occasional light exercise';
+            else if (value < 50) guide = 'Average fitness - some regular activity';
+            else if (value < 70) guide = 'Above average - regular exercise routine';
+            else if (value < 85) guide = 'Good fitness - frequent intense exercise';
+            else if (value < 95) guide = 'Very fit - athlete/fitness enthusiast';
+            else guide = 'Elite fitness - competitive athlete level';
+            
+            guideDisplay.textContent = guide;
+        };
         
         rangeInput.addEventListener('input', (e) => {
             valueDisplay.textContent = e.target.value;
+            updateFitnessGuide(parseInt(e.target.value));
         });
+        
+        // Initialize guide
+        updateFitnessGuide(50);
     }
     
     addBeltIndicators() {
@@ -148,6 +171,43 @@ export class PractitionerForm {
         
         // Trigger initial styling
         beltSelect.dispatchEvent(new Event('change'));
+    }
+    
+    setupGrapplingExperienceDropdowns() {
+        const artSelect = this.container.querySelector(`#${this.practitionerId}-grappling-art`);
+        const levelSelect = this.container.querySelector(`#${this.practitionerId}-grappling-level`);
+        
+        const updateLevelOptions = (selectedArt) => {
+            let levels = {};
+            
+            switch (selectedArt) {
+                case 'Wrestling':
+                    levels = WrestlingLevels;
+                    break;
+                case 'Judo':
+                    levels = JudoLevels;
+                    break;
+                case 'Sambo':
+                case 'Other':
+                    levels = OtherGrapplingLevels;
+                    break;
+                default:
+                    levels = { NONE: 'None' };
+            }
+            
+            levelSelect.innerHTML = Object.values(levels).map(level => 
+                `<option value="${level}">${level}</option>`
+            ).join('');
+        };
+        
+        // Set up event listener for art changes
+        artSelect.addEventListener('change', (e) => {
+            updateLevelOptions(e.target.value);
+            this.handleFormUpdate();
+        });
+        
+        // Initialize with default selection
+        updateLevelOptions(artSelect.value);
     }
     
     bindEvents() {
@@ -181,12 +241,16 @@ export class PractitionerForm {
     handleFormUpdate() {
         try {
             const formData = this.getFormData();
+            console.log(`Form data for ${this.practitionerId}:`, formData);
+            
             this.currentData = new PractitionerData(formData);
+            console.log(`Practitioner data for ${this.practitionerId}:`, this.currentData);
             
             // Add visual feedback for successful validation
             this.showValidationSuccess();
             
             if (this.onUpdate) {
+                console.log(`Calling onUpdate for ${this.practitionerId}`);
                 this.onUpdate(this.currentData);
             }
         } catch (error) {
@@ -212,18 +276,14 @@ export class PractitionerForm {
             formData[field] = value;
         });
         
-        // Handle grappling experience separately
+        // Handle grappling experience separately - always include the selection
         const grapplingArt = this.container.querySelector(`#${this.practitionerId}-grappling-art`).value;
         const grapplingLevel = this.container.querySelector(`#${this.practitionerId}-grappling-level`).value;
         
-        if (grapplingArt !== 'None' && grapplingLevel !== 'None') {
-            formData.otherGrapplingArtExperience = [{
-                artName: grapplingArt,
-                experienceLevel: grapplingLevel
-            }];
-        } else {
-            formData.otherGrapplingArtExperience = [];
-        }
+        formData.otherGrapplingArtExperience = [{
+            artName: grapplingArt,
+            experienceLevel: grapplingLevel
+        }];
         
         formData.practitionerId = this.practitionerId;
         

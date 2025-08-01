@@ -16,13 +16,31 @@ export const GrapplingArts = {
     OTHER: 'Other'
 };
 
-export const ExperienceLevels = {
+export const WrestlingLevels = {
     NONE: 'None',
-    RECREATIONAL: 'Recreational/Limited (<1 year)',
-    FOUNDATIONAL: 'Foundational (1-3 years)',
-    ACCOMPLISHED: 'Accomplished (3-5+ years, regional level)',
-    HIGH_LEVEL: 'High-Level Competitor (National level)',
-    ELITE: 'Elite International (Olympic/World level)'
+    HIGH_SCHOOL: 'High School',
+    HIGH_SCHOOL_STATE: 'High School State Qualifier',
+    COLLEGE: 'College',
+    COLLEGE_D1: 'College D1',
+    INTERNATIONAL_OLYMPIC: 'International/Olympic'
+};
+
+export const JudoLevels = {
+    NONE: 'None',
+    LOCAL: 'Local',
+    REGIONAL: 'Regional', 
+    NATIONAL: 'National',
+    INTERNATIONAL: 'International',
+    OLYMPIC: 'Olympic'
+};
+
+export const OtherGrapplingLevels = {
+    NONE: 'None',
+    RECREATIONAL: 'Recreational (<1 year)',
+    CLUB_LEVEL: 'Club Level (1-3 years)',
+    REGIONAL: 'Regional Competition',
+    NATIONAL: 'National Competition',
+    INTERNATIONAL: 'International Competition'
 };
 
 export const CompetitionLevels = {

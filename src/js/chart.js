@@ -121,12 +121,12 @@ export class RadarChart {
     }
     
     getMaxScale() {
-        // Dynamic scaling based on typical factor ranges
-        return 1000; // BRS can go up to 800, so 1000 gives good headroom
+        // Better scaling - BRS is the largest value (800), but factors are mostly 0.8-1.4
+        return 2.0; // This will show the multiplier factors properly, BRS will be normalized
     }
     
     getStepSize() {
-        return 200;
+        return 0.5;
     }
     
     updateData(factorResults, practitionerNames) {
@@ -156,7 +156,7 @@ export class RadarChart {
             return {
                 label: name,
                 data: [
-                    factors.brs,
+                    factors.brs / 400, // Normalize BRS to similar scale as other factors (divide by 400 to get ~0.25-2.0 range)
                     factors.af,
                     factors.wf,
                     factors.acf,

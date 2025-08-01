@@ -42,29 +42,36 @@ export class ConfigManager {
                     { "level_id": 5, "description": "Elite International (e.g., Olympic/World Medalist in Wrestling/Judo)", "multiplier": 1.38 }
                 ],
                 "art_experience_level_mapping": {
-                    "Wrestling_Recreational/Limited (<1 year)": 1,
-                    "Wrestling_Foundational (1-3 years)": 2,
-                    "Wrestling_Accomplished (3-5+ years, regional level)": 3,
-                    "Wrestling_High-Level Competitor (National level)": 4,
-                    "Wrestling_Elite International (Olympic/World level)": 5,
+                    // Wrestling levels
+                    "Wrestling_None": 0,
+                    "Wrestling_High School": 1,
+                    "Wrestling_High School State Qualifier": 2,
+                    "Wrestling_College": 3,
+                    "Wrestling_College D1": 4,
+                    "Wrestling_International/Olympic": 5,
                     
-                    "Judo_Recreational/Limited (<1 year)": 1,
-                    "Judo_Foundational (1-3 years)": 2, 
-                    "Judo_Accomplished (3-5+ years, regional level)": 3,
-                    "Judo_High-Level Competitor (National level)": 4,
-                    "Judo_Elite International (Olympic/World level)": 5,
+                    // Judo levels
+                    "Judo_None": 0,
+                    "Judo_Local": 1,
+                    "Judo_Regional": 2, 
+                    "Judo_National": 3,
+                    "Judo_International": 4,
+                    "Judo_Olympic": 5,
                     
-                    "Sambo_Recreational/Limited (<1 year)": 1,
-                    "Sambo_Foundational (1-3 years)": 2,
-                    "Sambo_Accomplished (3-5+ years, regional level)": 3,
-                    "Sambo_High-Level Competitor (National level)": 4,
-                    "Sambo_Elite International (Olympic/World level)": 5,
+                    // Sambo and Other levels
+                    "Sambo_None": 0,
+                    "Sambo_Recreational (<1 year)": 1,
+                    "Sambo_Club Level (1-3 years)": 2,
+                    "Sambo_Regional Competition": 3,
+                    "Sambo_National Competition": 4,
+                    "Sambo_International Competition": 5,
                     
-                    "Other_Recreational/Limited (<1 year)": 1,
-                    "Other_Foundational (1-3 years)": 2,
-                    "Other_Accomplished (3-5+ years, regional level)": 3,
-                    "Other_High-Level Competitor (National level)": 4,
-                    "Other_Elite International (Olympic/World level)": 5,
+                    "Other_None": 0,
+                    "Other_Recreational (<1 year)": 1,
+                    "Other_Club Level (1-3 years)": 2,
+                    "Other_Regional Competition": 3,
+                    "Other_National Competition": 4,
+                    "Other_International Competition": 5,
                     
                     "None_None": 0
                 }
